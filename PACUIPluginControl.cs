@@ -16,6 +16,8 @@ using System.Windows.Forms;
 using XrmToolBox.Extensibility;
 using System.Reflection;
 using XrmToolBox.Extensibility.Interfaces;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
+using NuGet.Protocol.Plugins;
 
 namespace MikeFactorial.XTB.PACUI
 {
@@ -34,7 +36,6 @@ namespace MikeFactorial.XTB.PACUI
         private IEnumerable<NuGetVersion> versions = null;
         private TreeNode currentSelectedNode = null;
         private PacTag currentSelectedTag = null;
-        private System.Diagnostics.Process pProcess;
         private TreeNode mainNode = null;
         private List<string> existingPacConnections = new List<string>();
         public delegate void SetOutputTextCallback(string strText);
@@ -90,7 +91,6 @@ namespace MikeFactorial.XTB.PACUI
             }
             this.currentSelectedNode = null;
             this.currentSelectedTag = null;
-            this.StopProcess();
             string results = ExecutePacCommand("help", false);
             mainNode.Tag = new PacTag(ref mainNode)
             {
@@ -131,12 +131,6 @@ namespace MikeFactorial.XTB.PACUI
             }
         }
 
-        private async Task RetrievePacVersions()
-        {
-            resource = await repository.GetResourceAsync<FindPackageByIdResource>();
-            versions = await resource.GetAllVersionsAsync(packageId, cache, logger, cancellationToken);
-            UpdatePacVersions(versions);
-        }
         private async Task InstallSelectedPacVersion()
         {
             NuGetVersion selectedVersion = versions.LastOrDefault();
@@ -192,35 +186,27 @@ namespace MikeFactorial.XTB.PACUI
         }
         private string ExecutePacCommand(string command, bool streamOutputToLabel)
         {
-            if(!streamOutputToLabel)
-            {
-                //Cancel the current pac session if it exists
-                StopProcess();
-            }
             if (!string.IsNullOrEmpty(PacExecutable))
             {
-                if (pProcess == null)
+                //Create process
+                System.Diagnostics.Process pProcess = new System.Diagnostics.Process();
+                //strCommand is path and file name of command to run
+                pProcess.StartInfo.FileName = PacExecutable;
+                pProcess.StartInfo.UseShellExecute = false;
+                pProcess.StartInfo.CreateNoWindow = true;
+                //Set output of program to be written to process output stream
+                pProcess.StartInfo.RedirectStandardOutput = true;
+                //Optional
+                pProcess.StartInfo.WorkingDirectory = pacPath;
+                if (streamOutputToLabel)
                 {
-                    //Create process
-                    pProcess = new System.Diagnostics.Process();
-                    //strCommand is path and file name of command to run
-                    pProcess.StartInfo.FileName = PacExecutable;
-                    pProcess.StartInfo.UseShellExecute = false;
-                    pProcess.StartInfo.CreateNoWindow = true;
-                    //Set output of program to be written to process output stream
-                    pProcess.StartInfo.RedirectStandardOutput = true;
-                    //Optional
-                    pProcess.StartInfo.WorkingDirectory = pacPath;
-                    if (streamOutputToLabel)
-                    {
-                        textBoxOutput.Text = $"Executing command '{command}'";
-                        pProcess.ErrorDataReceived += Process_OutputDataReceived;
-                        pProcess.OutputDataReceived += Process_OutputDataReceived;
-                        //strCommandParameters are parameters to pass to program
-                        pProcess.StartInfo.Arguments = command;
-                        pProcess.Start();
-                        pProcess.BeginOutputReadLine();
-                    }
+                    textBoxOutput.Text = $"Executing command '{command}'";
+                    pProcess.ErrorDataReceived += Process_OutputDataReceived;
+                    pProcess.OutputDataReceived += Process_OutputDataReceived;
+                    //strCommandParameters are parameters to pass to program
+                    pProcess.StartInfo.Arguments = command;
+                    pProcess.Start();
+                    pProcess.BeginOutputReadLine();
                 }
 
                 if (streamOutputToLabel)
@@ -315,105 +301,13 @@ namespace MikeFactorial.XTB.PACUI
         public override void UpdateConnection(IOrganizationService newService, ConnectionDetail detail, string actionName, object parameter)
         {
             base.UpdateConnection(newService, detail, actionName, parameter);
-            SyncPacAuthWithConnection(detail);
-        }
-
-        private void SyncPacAuthWithConnection(ConnectionDetail connection)
-        {
             WorkAsync(new WorkAsyncInfo
             {
                 IsCancelable = true,
                 Message = $"Authorizing Power Platform CLI...",
                 Work = (worker, args) =>
                 {
-                    string authlist = ExecutePacCommand("auth list", false);
-                    bool connectionUpdated = false;
-                    if (this.InvokeRequired)
-                    {
-                        this.Invoke(new MethodInvoker(delegate
-                        {
-                            this.toolStripDropDownButton1.DropDownItems.Clear();
-                            this.toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[]
-                            {
-                                this.syncCLIAuthWithCurrentConnectionToolStripMenuItem,
-                                this.toolStripSeparator3
-                            });
-                        }));
-                    }
-
-                    foreach (var auth in authlist.Split('\n'))
-                    {
-                        if (auth.Trim().StartsWith("["))
-                        {
-                            if (this.InvokeRequired)
-                            {
-                                this.Invoke(new MethodInvoker(delegate
-                                {
-                                    //Create connection menu item for this auth
-                                    ToolStripMenuItem connectionItem = new ToolStripMenuItem();
-                                    connectionItem.Name = auth;
-                                    connectionItem.Text = auth;
-                                    connectionItem.Click += new System.EventHandler(this.syncCLIAuthWithCurrentConnectionToolStripMenuItem_Click);
-                                    this.toolStripDropDownButton1.DropDownItems.Add(connectionItem);
-                                }));
-                            }
-                        }
-
-                        if (auth.ToLower().Contains(connection.WebApplicationUrl.ToLower()))
-                        {
-                            connectionUpdated = SyncPacAuthWithSelected(auth, $"An existing authentication profile was found for the current connection. The authentication profile has been selected to use for future commands.");
-                        }
-                    }
-
-                    if (!connectionUpdated && mainNode != null)
-                    {
-                        var authNode = mainNode.Nodes.OfType<TreeNode>().ToList().FirstOrDefault(n => n.Text == "auth");
-                        if (authNode != null)
-                        {
-                            if (this.InvokeRequired)
-                            {
-                                this.Invoke(new MethodInvoker(delegate
-                                {
-                                    treePacCommands.SelectedNode = authNode;
-                                }));
-                            }
-                            var createNode = authNode.Nodes.OfType<TreeNode>().ToList().FirstOrDefault(n => n.Text == "create");
-                            if (createNode != null)
-                            {
-                                if (this.InvokeRequired)
-                                {
-                                    this.Invoke(new MethodInvoker(delegate
-                                    {
-                                        treePacCommands.SelectedNode = createNode;
-                                    }));
-                                }
-
-                                foreach (TreeNode argNode in createNode.Nodes)
-                                {
-                                    if (((PacTag)argNode.Tag).Name == "--name")
-                                    {
-                                        ((PacTag)argNode.Tag).Value = connection.ConnectionName;
-                                    }
-                                    else if (((PacTag)argNode.Tag).Name == "--username")
-                                    {
-                                        ((PacTag)argNode.Tag).Value = connection.UserName;
-                                    }
-                                    else if (((PacTag)argNode.Tag).Name == "--environment")
-                                    {
-                                        ((PacTag)argNode.Tag).Value = connection.WebApplicationUrl;
-                                    }
-                                    /*
-                                    else if (((PacTag)argNode.Tag).Name == "--applicationId")
-                                    {
-                                        ((PacTag)argNode.Tag).Value = connection.AzureAdAppId;
-                                    }
-                                    */
-                                }
-                            }
-                        }
-                        UpdateCommandText();
-                        ShowInfoNotification("No existing authentication profile could be found for the current connection. Use pac auth create to create a new authentication prfoile. We've prefilled some of the values based on the current connection.", null);
-                    }
+                    SyncPacAuthWithConnection(detail);
                 },
                 PostWorkCallBack = (args) =>
                 {
@@ -423,8 +317,104 @@ namespace MikeFactorial.XTB.PACUI
                         return;
                     }
                 }
-
             });
+        }
+        private void LoadPacAuthorizationProfiles()
+        {
+            if(this.InvokeRequired)
+            {
+                this.Invoke(new MethodInvoker(delegate
+                {
+                    LoadPacAuthorizationProfiles();
+                }));
+
+            }
+            else
+            {
+                string authlist = ExecutePacCommand("auth list", false);
+                this.toolStripDropDownButton1.DropDownItems.Clear();
+                this.toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[]
+                {
+                    this.syncCLIAuthWithCurrentConnectionToolStripMenuItem,
+                    this.toolStripSeparator3
+                });
+
+                foreach (var auth in authlist.Split('\n'))
+                {
+                    if (auth.Trim().StartsWith("["))
+                    {
+                        //Create connection menu item for this auth
+                        ToolStripMenuItem connectionItem = new ToolStripMenuItem();
+                        connectionItem.Name = auth;
+                        connectionItem.Text = auth;
+                        connectionItem.Click += new System.EventHandler(this.syncCLIAuthWithCurrentConnectionToolStripMenuItem_Click);
+                        this.toolStripDropDownButton1.DropDownItems.Add(connectionItem);
+                    }
+                }
+            }
+        }
+        private void SyncPacAuthWithConnection(ConnectionDetail connection)
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new MethodInvoker(delegate
+                {
+                    SyncPacAuthWithConnection(connection);
+                }));
+            }
+            else
+            {
+                LoadPacAuthorizationProfiles();
+                bool connectionUpdated = false;
+                foreach (object auth in this.toolStripDropDownButton1.DropDownItems)
+                {
+                    if (auth is ToolStripMenuItem && ((ToolStripMenuItem)auth).Name.ToLower().Contains(connection.WebApplicationUrl.ToLower()))
+                    {
+                        connectionUpdated = SyncPacAuthWithSelected(((ToolStripMenuItem)auth).Name, $"An existing authentication profile was found for the current connection. The authentication profile has been selected to use for future commands.");
+                    }
+                }
+
+                if (!connectionUpdated && mainNode != null)
+                {
+                    var authNode = mainNode.Nodes.OfType<TreeNode>().ToList().FirstOrDefault(n => n.Text == "auth");
+                    if (authNode != null)
+                    {
+                        LoadNodes(authNode, PacTag.PacTagType.Noun, false);
+                        var createNode = authNode.Nodes.OfType<TreeNode>().ToList().FirstOrDefault(n => n.Text == "create");
+                        if (createNode != null)
+                        {
+                            LoadNodes(createNode, PacTag.PacTagType.Verb, false);
+                            treePacCommands.SelectedNode = createNode;
+                            foreach (TreeNode argNode in createNode.Nodes)
+                            {
+                                if (((PacTag)argNode.Tag).Name == "--name")
+                                {
+                                    ((PacTag)argNode.Tag).Value = connection.ConnectionName;
+                                }
+                                else if (((PacTag)argNode.Tag).Name == "--username")
+                                {
+                                    ((PacTag)argNode.Tag).Value = connection.UserName;
+                                }
+                                else if (((PacTag)argNode.Tag).Name == "--environment")
+                                {
+                                    ((PacTag)argNode.Tag).Value = connection.WebApplicationUrl;
+                                }
+                                /*
+                                else if (((PacTag)argNode.Tag).Name == "--applicationId")
+                                {
+                                    ((PacTag)argNode.Tag).Value = connection.AzureAdAppId;
+                                }
+                                */
+                            }
+                        }
+                    }
+                    ShowInfoNotification("No existing authentication profile could be found for the current connection. Use pac auth create to create a new authentication prfoile. We've prefilled some of the values based on the current connection.", null);
+                }
+                else
+                {
+                    LoadPacAuthorizationProfiles();
+                }
+            }
         }
 
         private bool SyncPacAuthWithSelected(string auth, string message)
@@ -574,8 +564,10 @@ namespace MikeFactorial.XTB.PACUI
                 Message = "Getting the latest version of Power Platform CLI...",
                 Work = async (worker, args) =>
                 {
-                    await RetrievePacVersions();
-                    //SyncPacAuthWithConnection(this.ConnectionDetail);
+                    resource = await repository.GetResourceAsync<FindPackageByIdResource>();
+                    versions = await resource.GetAllVersionsAsync(packageId, cache, logger, cancellationToken);
+                    UpdatePacVersions(versions);
+                    SyncPacAuthWithConnection(this.ConnectionDetail);
                 },
                 ProgressChanged = (args) =>
                 {
@@ -590,7 +582,6 @@ namespace MikeFactorial.XTB.PACUI
                     }
                 }
             });
-
             // Loads or creates the settings for the plugin
             if (!SettingsManager.Instance.TryLoad(GetType(), out mySettings))
             {
@@ -604,17 +595,12 @@ namespace MikeFactorial.XTB.PACUI
             }
         }
 
-        private void tsbClose_Click(object sender, EventArgs e)
-        {
-            CloseTool();
-        }
-
         private void treePacCommands_AfterSelect(object sender, TreeViewEventArgs e)
         {
             this.currentSelectedNode = e.Node;
             this.currentSelectedTag = e.Node.Tag as PacTag;
 
-            if(currentSelectedTag.Type == PacTag.PacTagType.Verb)
+            if(currentSelectedTag != null && currentSelectedTag.Type == PacTag.PacTagType.Verb)
             {
                 UpdateCommandText();
             }
@@ -634,11 +620,48 @@ namespace MikeFactorial.XTB.PACUI
             toolStripRunButton.Enabled = (currentSelectedTag.Type == PacTag.PacTagType.Verb && !string.IsNullOrEmpty(textBoxCommandText.Text));
         }
 
+        private void LoadNodes(TreeNode node, PacTag.PacTagType type, bool expand)
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new MethodInvoker(delegate
+                {
+                    LoadNodes(node, type, expand);
+                }));
+            }
+            else
+            {
+                string command = (type == PacTag.PacTagType.Verb) ? $"{node.Parent.Text} {node.Text} help" : $"{node.Text} help";
+                var results = ExecutePacCommand(command, false);
+                ((PacTag)node.Tag).HelpText = results.Trim();
+                node.Nodes.Clear();
+                foreach (var newNode in RetrieveUsageDetails(results))
+                {
+                    var actionNode = new TreeNode(newNode);
+                    actionNode.Tag = new PacTag(ref actionNode)
+                    {
+                        Type = PacTag.PacTagType.Verb,
+                        Name = newNode,
+                        Value = string.Empty
+                    };
+
+                    actionNode.Nodes.Add(new TreeNode());
+                    node.Nodes.Add(actionNode);
+                }
+                if (expand)
+                {
+                    node.Expand();
+                }
+                if (type == PacTag.PacTagType.Verb)
+                {
+                    UpdatePropertyGridProperties(node.Nodes);
+                }
+            }
+        }
         private void TreePacCommands_BeforeExpand(object sender, TreeViewCancelEventArgs e)
         {
             if (e.Node.Nodes.Count == 1 && string.IsNullOrEmpty(e.Node.Nodes[0].Text) && e.Node.Parent != null && e.Node.Parent.Text == "pac")
             {
-                e.Node.Nodes.Clear();
                 //Load Verbs for the selected Noun
                 WorkAsync(new WorkAsyncInfo
                 {
@@ -646,32 +669,7 @@ namespace MikeFactorial.XTB.PACUI
                     Message = $"Loading...",
                     Work = (worker, args) =>
                     {
-                        var results = ExecutePacCommand($"{e.Node.Text} help", false);
-                        ((PacTag)e.Node.Tag).HelpText = results.Trim();
-                        foreach (var verb in RetrieveUsageDetails(results))
-                        {
-                            var verbNode = new TreeNode(verb);
-                            verbNode.Tag = new PacTag(ref verbNode)
-                            {
-                                Type = PacTag.PacTagType.Verb,
-                                Name = verb,
-                                Value = string.Empty
-                            };
-
-                            verbNode.Nodes.Add(new TreeNode());
-                            if (((Control)sender).InvokeRequired)
-                            {
-                                ((Control)sender).Invoke(new MethodInvoker(delegate
-                                {
-                                    e.Node.Nodes.Add(verbNode);
-                                }));
-                            }
-                        }
-                        if (((Control)sender).InvokeRequired)
-                        {
-                            ((Control)sender).Invoke(new MethodInvoker(delegate { e.Node.Expand(); }));
-                        }
-
+                        LoadNodes(e.Node, PacTag.PacTagType.Noun, false);
                     },
                     ProgressChanged = (args) =>
                     {
@@ -689,7 +687,6 @@ namespace MikeFactorial.XTB.PACUI
             }
             else if (e.Node.Nodes.Count == 1 && string.IsNullOrEmpty(e.Node.Nodes[0].Text) && e.Node.Parent != null)
             {
-                e.Node.Nodes.Clear();
                 //Load Arguments for the selected Verb
                 WorkAsync(new WorkAsyncInfo
                 {
@@ -697,37 +694,7 @@ namespace MikeFactorial.XTB.PACUI
                     Message = $"Loading...",
                     Work = (worker, args) =>
                     {
-                        var results = ExecutePacCommand($"{e.Node.Parent.Text} {e.Node.Text} help", false);
-                        ((PacTag)e.Node.Tag).HelpText = results.Trim();
-                        foreach (var argument in RetrieveUsageDetails(results))
-                        {
-                            var argNode = new TreeNode(argument);
-                            string helpText = RetrieveNodeHelpText(results, argument);
-                            argNode.Tag = new PacTag(ref argNode)
-                            {
-                                Type = PacTag.PacTagType.Argument,
-                                Name = argument,
-                                HelpText = helpText,
-                                Value = GetDefaultArgumentValue(helpText)
-                            };
-                            if (((Control)sender).InvokeRequired)
-                            {
-                                ((Control)sender).Invoke(new MethodInvoker(delegate
-                                {
-                                    e.Node.Nodes.Add(argNode);
-                                }));
-                            }
-                        }
-                        if (((Control)sender).InvokeRequired)
-                        {
-                            ((Control)sender).Invoke(new MethodInvoker(delegate 
-                            { 
-                                e.Node.Expand();
-                                UpdatePropertyGridProperties(e.Node.Nodes);
-
-                            }));
-                        }
-
+                        LoadNodes(e.Node, PacTag.PacTagType.Verb, false);
                     },
                     ProgressChanged = (args) =>
                     {
@@ -762,32 +729,42 @@ namespace MikeFactorial.XTB.PACUI
 
         private void toolStripRunButton_Click(object sender, EventArgs e)
         {
-            StopProcess();
             if (currentSelectedTag.Type == PacTag.PacTagType.Verb && !string.IsNullOrEmpty(textBoxCommandText.Text))
             {
                 ExecutePacCommand(textBoxCommandText.Text.Replace("pac ", ""), true);
-            }
-        }
-
-        private void StopProcess()
-        {
-            if (pProcess != null)
-            {
-                pProcess.Close();
-                pProcess.Dispose();
-                pProcess = null;
+                if (textBoxCommandText.Text.Contains("pac auth"))
+                {
+                    LoadPacAuthorizationProfiles();
+                }
             }
         }
         private void syncCLIAuthWithCurrentConnectionToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (((ToolStripMenuItem)sender).Name == syncCLIAuthWithCurrentConnectionToolStripMenuItem.Name)
+            WorkAsync(new WorkAsyncInfo
             {
-                SyncPacAuthWithConnection(ConnectionDetail);
-            }
-            else
-            {
-                SyncPacAuthWithSelected(((ToolStripMenuItem)sender).Name, $"The authentication profile updated to use for future commands. NOTE: Your command line connection may no longer be in sync with the XrmToolBox connection.");
-            }
+                IsCancelable = true,
+                Message = $"Authorizing Power Platform CLI...",
+                Work = (worker, args) =>
+                {
+                    if (((ToolStripMenuItem)sender).Name == syncCLIAuthWithCurrentConnectionToolStripMenuItem.Name)
+                    {
+                        SyncPacAuthWithConnection(ConnectionDetail);
+                    }
+                    else
+                    {
+                        SyncPacAuthWithSelected(((ToolStripMenuItem)sender).Name, $"The authentication profile updated to use for future commands. NOTE: Your command line connection may no longer be in sync with the XrmToolBox connection.");
+                    }
+                    LoadPacAuthorizationProfiles();
+                },
+                PostWorkCallBack = (args) =>
+                {
+                    if (args.Error != null)
+                    {
+                        ShowErrorNotification("An error ocurred when trying to set the command line authorization. Try running 'Sync CLI Auth with Current Connection' or run 'pac auth select' from the command line to run commands against your environment.", null);
+                        return;
+                    }
+                }
+            });
         }
         #endregion
     }
