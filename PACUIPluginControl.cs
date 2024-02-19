@@ -21,57 +21,52 @@ using NuGet.Protocol.Plugins;
 
 namespace MikeFactorial.XTB.PACUI
 {
-    public partial class PACUIPluginControl : PluginControlBase, IGitHubPlugin
+    public partial class PACUIPluginControl : PluginControlBase, IGitHubPlugin, IHelpPlugin
     {
         private string[] unsupportedActions = { "powerfx repl" };
         private Settings mySettings;
         private string pacPath;
-        private string nugetVersionLoaded = "";
 
-        private NuGet.Common.ILogger logger = NullLogger.Instance;
-        private CancellationToken cancellationToken = CancellationToken.None;
-        private string packageId = "Microsoft.PowerApps.CLI";
-        private SourceCacheContext cache = new SourceCacheContext();
-        private SourceRepository repository = Repository.Factory.GetCoreV3("https://api.nuget.org/v3/index.json");
-        private FindPackageByIdResource resource = null;
-        private IEnumerable<NuGetVersion> versions = null;
+        private PacCLINugetFeed nugetFeed = new PacCLINugetFeed();
         private TreeNode currentSelectedNode = null;
         private PacTag currentSelectedTag = null;
         private TreeNode mainNode = null;
         private List<string> existingPacConnections = new List<string>();
-        public delegate void SetOutputTextCallback(string strText);
-        public SetOutputTextCallback outputTextCallback;
-        delegate void UpdatePacVersionsCallback(IEnumerable<NuGetVersion> versions);
 
+        public PACUIPluginControl(PacCLINugetFeed feed) : this()
+        {
+            nugetFeed = feed;
+        }
         public PACUIPluginControl()
         {
             InitializeComponent();
-            outputTextCallback = new SetOutputTextCallback(AddTextToOutputLabel);
         }
 
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+        }
         #region Methods
-        private void AddTextToOutputLabel(string strText)
-        {
-            this.textBoxOutput.AppendText(strText);
-        }
 
-        private void UpdatePacVersions(IEnumerable<NuGetVersion> versions)
+        public void UpdatePacVersions()
         {
-            if (this.toolStripCLIVersionsDropDown.Control.InvokeRequired)
+            if (this.InvokeRequired)
             {
-                UpdatePacVersionsCallback d = new UpdatePacVersionsCallback(UpdatePacVersions);
-                this.Invoke(d, new object[] { versions });
+                this.Invoke(new MethodInvoker(delegate
+                {
+                    UpdatePacVersions();
+                }));
             }
             else
             {
                 toolStripCLIVersionsDropDown.Items.Clear();
-                toolStripCLIVersionsDropDown.Items.AddRange(versions.Reverse().ToArray());
+                toolStripCLIVersionsDropDown.Items.AddRange(NugetFeed.Versions.Reverse().ToArray());
                 if (toolStripCLIVersionsDropDown.SelectedItem == null)
                 {
-                    toolStripCLIVersionsDropDown.SelectedItem = versions.LastOrDefault();
+                    toolStripCLIVersionsDropDown.SelectedItem = NugetFeed.Versions.LastOrDefault();
                 }
                 pacPath = $"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\\Microsoft.PowerApps.CLI.{((NuGetVersion)toolStripCLIVersionsDropDown.SelectedItem).OriginalVersion.ToString()}";
-                nugetVersionLoaded = ((NuGetVersion)toolStripCLIVersionsDropDown.SelectedItem).OriginalVersion;
+                NugetFeed.NugetVersionLoaded = ((NuGetVersion)toolStripCLIVersionsDropDown.SelectedItem).OriginalVersion;
             }
         }
 
@@ -132,9 +127,9 @@ namespace MikeFactorial.XTB.PACUI
             }
         }
 
-        private async Task InstallSelectedPacVersion()
+        public virtual async Task InstallSelectedPacVersion()
         {
-            NuGetVersion selectedVersion = versions.LastOrDefault();
+            NuGetVersion selectedVersion = NugetFeed.Versions.LastOrDefault();
 
             if (toolStripCLIVersionsDropDown.Control.InvokeRequired)
             {
@@ -154,18 +149,18 @@ namespace MikeFactorial.XTB.PACUI
             {
                 using (var packageStream = new MemoryStream())
                 {
-                    await resource.CopyNupkgToStreamAsync(
-                        packageId,
+                    await NugetFeed.Resource.CopyNupkgToStreamAsync(
+                        NugetFeed.PackageId,
                         selectedVersion,
                         packageStream,
-                        cache,
-                        logger,
-                        cancellationToken);
+                        NugetFeed.Cache,
+                        NugetFeed.Logger,
+                        NugetFeed.CancellationToken);
 
                     packageStream.Position = 0; // Reset stream position
 
                     // Define the package and the folder to unpack to
-                    PackageIdentity identity = new PackageIdentity(packageId, selectedVersion);
+                    PackageIdentity identity = new PackageIdentity(NugetFeed.PackageId, selectedVersion);
                     string currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                     PackagePathResolver pathResolver = new PackagePathResolver(currentDirectory);
 
@@ -177,11 +172,11 @@ namespace MikeFactorial.XTB.PACUI
 
                     // Unpack the package
                     await PackageExtractor.ExtractPackageAsync(
-                        repository.PackageSource.Source,
+                        NugetFeed.Repository.PackageSource.Source,
                         packageStream,
                         pathResolver,
                         packageExtractionContext,
-                        cancellationToken);
+                        NugetFeed.CancellationToken);
                 }
             }
         }
@@ -236,9 +231,16 @@ namespace MikeFactorial.XTB.PACUI
             if (!String.IsNullOrEmpty(e.Data))
             {
                 if (this.InvokeRequired)
-                    this.Invoke(outputTextCallback, Environment.NewLine + e.Data);
+                {
+                    this.Invoke(new MethodInvoker(delegate
+                    {
+                        Process_OutputDataReceived(sender, e);
+                    }));
+                }
                 else
-                    outputTextCallback(Environment.NewLine + e.Data);
+                {
+                    this.textBoxOutput.AppendText(Environment.NewLine + e.Data);
+                }
             }
         }
 
@@ -380,11 +382,11 @@ namespace MikeFactorial.XTB.PACUI
                     var authNode = mainNode.Nodes.OfType<TreeNode>().ToList().FirstOrDefault(n => n.Text == "auth");
                     if (authNode != null)
                     {
-                        LoadNodes(authNode, PacTag.PacTagType.Noun, false);
+                        LoadChildNodes(authNode, PacTag.PacTagType.Noun, false);
                         var createNode = authNode.Nodes.OfType<TreeNode>().ToList().FirstOrDefault(n => n.Text == "create");
                         if (createNode != null)
                         {
-                            LoadNodes(createNode, PacTag.PacTagType.Verb, false);
+                            LoadChildNodes(createNode, PacTag.PacTagType.Verb, false);
                             treePacCommands.SelectedNode = createNode;
                             foreach (TreeNode argNode in createNode.Nodes)
                             {
@@ -472,6 +474,27 @@ namespace MikeFactorial.XTB.PACUI
         #endregion
 
         #region Properties
+        public virtual PacCLINugetFeed NugetFeed
+        {
+            get
+            {
+                return this.nugetFeed;
+            }
+        }
+        public TextBox TextBoxOutput
+        {
+            get
+            {
+                return textBoxOutput;
+            }
+        }
+        public System.Windows.Forms.ToolStripComboBox ToolStripCLIVersionsDropDown
+        {
+            get
+            {
+                return toolStripCLIVersionsDropDown;
+            }
+        }
         /// <summary>
         /// Expands environment variables and, if unqualified, locates the exe in the working directory
         /// or the evironment's path.
@@ -495,6 +518,8 @@ namespace MikeFactorial.XTB.PACUI
         public string RepositoryName => "MikeFactorial.XTB.Plugins.PACUI";
 
         public string UserName => "mikefactorial";
+
+        public string HelpUrl => "https://learn.microsoft.com/power-platform/developer/cli/introduction";
         #endregion
 
         #region Events
@@ -511,7 +536,7 @@ namespace MikeFactorial.XTB.PACUI
 
         private async void toolStripCLIVersionsDropDown_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (nugetVersionLoaded != ((NuGetVersion)toolStripCLIVersionsDropDown.SelectedItem).OriginalVersion.ToString())
+            if (NugetFeed.NugetVersionLoaded != ((NuGetVersion)toolStripCLIVersionsDropDown.SelectedItem).OriginalVersion.ToString())
             {
                 this.treePacCommands.Nodes.Clear();
                 pacPath = $"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\\Microsoft.PowerApps.CLI.{((NuGetVersion)toolStripCLIVersionsDropDown.SelectedItem).OriginalVersion.ToString()}";
@@ -533,7 +558,7 @@ namespace MikeFactorial.XTB.PACUI
                             {
                                 this.Invoke(new MethodInvoker(delegate
                                 {
-                                    nugetVersionLoaded = ((NuGetVersion)toolStripCLIVersionsDropDown.SelectedItem).OriginalVersion;
+                                    NugetFeed.NugetVersionLoaded = ((NuGetVersion)toolStripCLIVersionsDropDown.SelectedItem).OriginalVersion;
                                 }));
                             }
                         },
@@ -557,7 +582,7 @@ namespace MikeFactorial.XTB.PACUI
                 }
             }
         }
-        private void MyPluginControl_Load(object sender, EventArgs e)
+        protected void MyPluginControl_Load(object sender, EventArgs e)
         {
             WorkAsync(new WorkAsyncInfo
             {
@@ -565,9 +590,8 @@ namespace MikeFactorial.XTB.PACUI
                 Message = "Getting the latest version of Power Platform CLI...",
                 Work = async (worker, args) =>
                 {
-                    resource = await repository.GetResourceAsync<FindPackageByIdResource>();
-                    versions = await resource.GetAllVersionsAsync(packageId, cache, logger, cancellationToken);
-                    UpdatePacVersions(versions);
+                    await NugetFeed.Initialize();
+                    UpdatePacVersions();
                     SyncPacAuthWithConnection(this.ConnectionDetail);
                 },
                 ProgressChanged = (args) =>
@@ -621,13 +645,13 @@ namespace MikeFactorial.XTB.PACUI
             toolStripRunButton.Enabled = (currentSelectedTag.Type == PacTag.PacTagType.Verb && !string.IsNullOrEmpty(textBoxCommandText.Text));
         }
 
-        private void LoadNodes(TreeNode node, PacTag.PacTagType type, bool expand)
+        private void LoadChildNodes(TreeNode node, PacTag.PacTagType type, bool expand)
         {
             if (this.InvokeRequired)
             {
                 this.Invoke(new MethodInvoker(delegate
                 {
-                    LoadNodes(node, type, expand);
+                    LoadChildNodes(node, type, expand);
                 }));
             }
             else
@@ -643,10 +667,14 @@ namespace MikeFactorial.XTB.PACUI
                     {
                         Type = PacTag.PacTagType.Verb,
                         Name = newNode,
-                        Value = string.Empty
-                    };
+                        Value = string.Empty,
+                        HelpText = RetrieveNodeHelpText(results, newNode)
 
-                    actionNode.Nodes.Add(new TreeNode());
+                    };
+                    if (type == PacTag.PacTagType.Noun)
+                    {
+                        actionNode.Nodes.Add(new TreeNode());
+                    }
                     node.Nodes.Add(actionNode);
                 }
                 if (expand)
@@ -656,6 +684,10 @@ namespace MikeFactorial.XTB.PACUI
                 if (type == PacTag.PacTagType.Verb)
                 {
                     UpdatePropertyGridProperties(node.Nodes);
+                }
+                if (node.Tag != null)
+                {
+                    this.textBoxParentNodeHelp.Text = ((PacTag)node.Tag).HelpText;
                 }
             }
         }
@@ -670,7 +702,7 @@ namespace MikeFactorial.XTB.PACUI
                     Message = $"Loading...",
                     Work = (worker, args) =>
                     {
-                        LoadNodes(e.Node, PacTag.PacTagType.Noun, false);
+                        LoadChildNodes(e.Node, PacTag.PacTagType.Noun, false);
                     },
                     ProgressChanged = (args) =>
                     {
@@ -695,7 +727,7 @@ namespace MikeFactorial.XTB.PACUI
                     Message = $"Loading...",
                     Work = (worker, args) =>
                     {
-                        LoadNodes(e.Node, PacTag.PacTagType.Verb, false);
+                        LoadChildNodes(e.Node, PacTag.PacTagType.Verb, false);
                     },
                     ProgressChanged = (args) =>
                     {
@@ -711,10 +743,6 @@ namespace MikeFactorial.XTB.PACUI
                     }
                 });
             }
-            if (currentSelectedTag != null)
-            {
-                this.textBoxParentNodeHelp.Text = currentSelectedTag.HelpText;
-            }
         }
 
         private void propertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
@@ -725,7 +753,7 @@ namespace MikeFactorial.XTB.PACUI
 
         private void propertyGrid1_SelectedGridItemChanged(object sender, SelectedGridItemChangedEventArgs e)
         {
-            propertyGrid1.DocCommentHeight = 400;
+            propertyGrid1.DocCommentHeight = 300;
         }
 
         private void toolStripRunButton_Click(object sender, EventArgs e)

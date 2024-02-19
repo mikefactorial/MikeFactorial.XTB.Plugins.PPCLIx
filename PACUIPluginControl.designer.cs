@@ -28,7 +28,7 @@ namespace MikeFactorial.XTB.PACUI
         /// Méthode requise pour la prise en charge du concepteur - ne modifiez pas 
         /// le contenu de cette méthode avec l'éditeur de code.
         /// </summary>
-        private void InitializeComponent()
+        public void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PACUIPluginControl));
             this.toolStripMenu = new System.Windows.Forms.ToolStrip();
@@ -42,7 +42,6 @@ namespace MikeFactorial.XTB.PACUI
             this.toolStripRunButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.groupCommandArgs = new System.Windows.Forms.GroupBox();
-            this.propertyGrid1 = new MikeFactorial.XTB.PACUI.PropertyGridEx();
             this.groupTree = new System.Windows.Forms.GroupBox();
             this.treePacCommands = new System.Windows.Forms.TreeView();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
@@ -52,6 +51,7 @@ namespace MikeFactorial.XTB.PACUI
             this.textBoxParentNodeHelp = new System.Windows.Forms.TextBox();
             this.groupBoxOutput = new System.Windows.Forms.GroupBox();
             this.textBoxOutput = new System.Windows.Forms.TextBox();
+            this.propertyGrid1 = new MikeFactorial.XTB.PACUI.PropertyGridEx();
             this.toolStripMenu.SuspendLayout();
             this.groupCommandArgs.SuspendLayout();
             this.groupTree.SuspendLayout();
@@ -149,18 +149,6 @@ namespace MikeFactorial.XTB.PACUI
             this.groupCommandArgs.TabIndex = 14;
             this.groupCommandArgs.TabStop = false;
             // 
-            // propertyGrid1
-            // 
-            this.propertyGrid1.DocCommentHeight = 59;
-            this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.propertyGrid1.LineColor = System.Drawing.SystemColors.ScrollBar;
-            this.propertyGrid1.Location = new System.Drawing.Point(3, 16);
-            this.propertyGrid1.Name = "propertyGrid1";
-            this.propertyGrid1.Size = new System.Drawing.Size(314, 459);
-            this.propertyGrid1.TabIndex = 18;
-            this.propertyGrid1.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid1_PropertyValueChanged);
-            this.propertyGrid1.SelectedGridItemChanged += new System.Windows.Forms.SelectedGridItemChangedEventHandler(this.propertyGrid1_SelectedGridItemChanged);
-            // 
             // groupTree
             // 
             this.groupTree.Controls.Add(this.treePacCommands);
@@ -245,6 +233,18 @@ namespace MikeFactorial.XTB.PACUI
             this.textBoxOutput.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textBoxOutput.Size = new System.Drawing.Size(343, 134);
             this.textBoxOutput.TabIndex = 25;
+            // 
+            // propertyGrid1
+            // 
+            this.propertyGrid1.DocCommentHeight = 59;
+            this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.propertyGrid1.LineColor = System.Drawing.SystemColors.ScrollBar;
+            this.propertyGrid1.Location = new System.Drawing.Point(3, 16);
+            this.propertyGrid1.Name = "propertyGrid1";
+            this.propertyGrid1.Size = new System.Drawing.Size(314, 459);
+            this.propertyGrid1.TabIndex = 18;
+            this.propertyGrid1.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid1_PropertyValueChanged);
+            this.propertyGrid1.SelectedGridItemChanged += new System.Windows.Forms.SelectedGridItemChangedEventHandler(this.propertyGrid1_SelectedGridItemChanged);
             // 
             // PACUIPluginControl
             // 
