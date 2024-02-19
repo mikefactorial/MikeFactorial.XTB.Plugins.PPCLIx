@@ -37,7 +37,7 @@ namespace MikeFactorial.XTB.Plugins.PACUI.Tests
             resource.Setup(r => r.CopyNupkgToStreamAsync(It.IsAny<string>(), It.IsAny<NuGetVersion>(), It.IsAny<Stream>(), It.IsAny<SourceCacheContext>(), It.IsAny<ILogger>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((string packageId, NuGetVersion version, Stream stream, SourceCacheContext cache, ILogger logger, CancellationToken token) => 
             {
-                using (FileStream file = new FileStream("../../Nuget/MikeFactorial.XTB.Plugins.PACUI.1.0.0.nupkg", FileMode.Open, FileAccess.Read))
+                using (FileStream file = new FileStream("../../Nuget/microsoft.powerapps.cli.1.30.7.nupkg", FileMode.Open, FileAccess.Read))
                 {
                     byte[] bytes = new byte[file.Length];
                     file.Read(bytes, 0, (int)file.Length);
@@ -75,13 +75,13 @@ namespace MikeFactorial.XTB.Plugins.PACUI.Tests
         [TestMethod]
         public async Task InstallSelectedPacVersionTest()
         {
-            if (Directory.Exists("./MikeFactorial.XTB.Plugins.PACUI.1.0.0"))
+            if (Directory.Exists("./microsoft.powerapps.cli.1.30.7"))
             {
-                Directory.Delete("./MikeFactorial.XTB.Plugins.PACUI.1.0.0", true);
+                Directory.Delete("./microsoft.powerapps.cli.1.30.7", true);
             }
             control.UpdatePacVersions();
             await control.InstallSelectedPacVersion();
-            Assert.IsTrue(Directory.Exists("./MikeFactorial.XTB.Plugins.PACUI.1.0.0"));
+            Assert.IsTrue(Directory.Exists("./microsoft.powerapps.cli.1.30.7"));
         }
     }
 }
