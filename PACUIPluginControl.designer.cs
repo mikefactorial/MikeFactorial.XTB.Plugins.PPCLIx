@@ -35,8 +35,12 @@ namespace MikeFactorial.XTB.PACUI
             this.toolStripPacVersionLabel = new System.Windows.Forms.ToolStripLabel();
             this.toolStripCLIVersionsDropDown = new System.Windows.Forms.ToolStripComboBox();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
+            this.syncCLIAuthWithCurrentConnectionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparator = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripRunButton = new System.Windows.Forms.ToolStripButton();
-            this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.groupCommandArgs = new System.Windows.Forms.GroupBox();
             this.propertyGrid1 = new MikeFactorial.XTB.PACUI.PropertyGridEx();
             this.groupTree = new System.Windows.Forms.GroupBox();
@@ -63,8 +67,10 @@ namespace MikeFactorial.XTB.PACUI
             this.toolStripPacVersionLabel,
             this.toolStripCLIVersionsDropDown,
             this.toolStripSeparator1,
+            this.toolStripDropDownButton1,
+            this.toolStripSeparator,
             this.toolStripRunButton,
-            this.toolStripButton1});
+            this.toolStripSeparator2});
             this.toolStripMenu.Location = new System.Drawing.Point(0, 0);
             this.toolStripMenu.Name = "toolStripMenu";
             this.toolStripMenu.Size = new System.Drawing.Size(989, 31);
@@ -88,6 +94,35 @@ namespace MikeFactorial.XTB.PACUI
             this.toolStripSeparator1.Name = "toolStripSeparator1";
             this.toolStripSeparator1.Size = new System.Drawing.Size(6, 31);
             // 
+            // toolStripDropDownButton1
+            // 
+            this.toolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.syncCLIAuthWithCurrentConnectionToolStripMenuItem,
+            this.toolStripSeparator3});
+            this.toolStripDropDownButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton1.Image")));
+            this.toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
+            this.toolStripDropDownButton1.Size = new System.Drawing.Size(37, 28);
+            this.toolStripDropDownButton1.Text = "Update CLI Connection";
+            // 
+            // syncCLIAuthWithCurrentConnectionToolStripMenuItem
+            // 
+            this.syncCLIAuthWithCurrentConnectionToolStripMenuItem.Name = "syncCLIAuthWithCurrentConnectionToolStripMenuItem";
+            this.syncCLIAuthWithCurrentConnectionToolStripMenuItem.Size = new System.Drawing.Size(282, 22);
+            this.syncCLIAuthWithCurrentConnectionToolStripMenuItem.Text = "Sync CLI Auth with Current Connection";
+            this.syncCLIAuthWithCurrentConnectionToolStripMenuItem.Click += new System.EventHandler(this.syncCLIAuthWithCurrentConnectionToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(279, 6);
+            // 
+            // toolStripSeparator
+            // 
+            this.toolStripSeparator.Name = "toolStripSeparator";
+            this.toolStripSeparator.Size = new System.Drawing.Size(6, 31);
+            // 
             // toolStripRunButton
             // 
             this.toolStripRunButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -96,18 +131,13 @@ namespace MikeFactorial.XTB.PACUI
             this.toolStripRunButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripRunButton.Name = "toolStripRunButton";
             this.toolStripRunButton.Size = new System.Drawing.Size(28, 28);
-            this.toolStripRunButton.Text = "Run Command";
+            this.toolStripRunButton.Text = "Run the Command in the Command Text Box";
             this.toolStripRunButton.Click += new System.EventHandler(this.toolStripRunButton_Click);
             // 
-            // toolStripButton1
+            // toolStripSeparator2
             // 
-            this.toolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton1.Image")));
-            this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton1.Name = "toolStripButton1";
-            this.toolStripButton1.Size = new System.Drawing.Size(28, 28);
-            this.toolStripButton1.Text = "toolStripButton1";
-            this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 31);
             // 
             // groupCommandArgs
             // 
@@ -263,6 +293,10 @@ namespace MikeFactorial.XTB.PACUI
         private TextBox textBoxParentNodeHelp;
         private GroupBox groupBoxOutput;
         private TextBox textBoxOutput;
-        private ToolStripButton toolStripButton1;
+        private ToolStripSeparator toolStripSeparator;
+        private ToolStripSeparator toolStripSeparator2;
+        private ToolStripDropDownButton toolStripDropDownButton1;
+        private ToolStripMenuItem syncCLIAuthWithCurrentConnectionToolStripMenuItem;
+        private ToolStripSeparator toolStripSeparator3;
     }
 }
