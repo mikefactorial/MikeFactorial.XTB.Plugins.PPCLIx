@@ -23,6 +23,7 @@ namespace MikeFactorial.XTB.PACUI
 {
     public partial class PACUIPluginControl : PluginControlBase, IGitHubPlugin
     {
+        private string[] unsupportedActions = { "powerfx repl" };
         private Settings mySettings;
         private string pacPath;
         private string nugetVersionLoaded = "";
