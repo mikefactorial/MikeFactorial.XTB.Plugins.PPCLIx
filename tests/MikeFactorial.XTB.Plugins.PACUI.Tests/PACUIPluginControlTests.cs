@@ -54,6 +54,18 @@ namespace MikeFactorial.XTB.Plugins.PACUI.Tests
             control = new PACUIPluginControl(nugetFeed.Object);
         }
         [TestMethod]
+        public void CheckRunEnabled()
+        {
+            Assert.IsFalse(control.ToolStripRunButton.Enabled);
+            control.TextBoxCommand.Text = "Test";
+            control.textBoxCommandText_TextChanged(control.TextBoxCommand, null);
+            Assert.IsFalse(control.ToolStripRunButton.Enabled);
+            control.TextBoxCommand.Text = "pac ";
+            control.textBoxCommandText_TextChanged(control.TextBoxCommand, null);
+            Assert.IsTrue(control.ToolStripRunButton.Enabled);
+
+        }
+        [TestMethod]
         public void LoadVersionsTest()
         {
             control.UpdatePacVersions();

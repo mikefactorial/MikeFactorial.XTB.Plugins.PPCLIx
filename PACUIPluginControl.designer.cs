@@ -191,6 +191,7 @@ namespace MikeFactorial.XTB.PACUI
             this.textBoxCommandText.Name = "textBoxCommandText";
             this.textBoxCommandText.Size = new System.Drawing.Size(343, 20);
             this.textBoxCommandText.TabIndex = 25;
+            this.textBoxCommandText.TextChanged += new System.EventHandler(this.textBoxCommandText_TextChanged);
             // 
             // groupBoxHelp
             // 

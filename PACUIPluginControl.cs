@@ -474,27 +474,11 @@ namespace MikeFactorial.XTB.PACUI
         #endregion
 
         #region Properties
-        public virtual PacCLINugetFeed NugetFeed
-        {
-            get
-            {
-                return this.nugetFeed;
-            }
-        }
-        public TextBox TextBoxOutput
-        {
-            get
-            {
-                return textBoxOutput;
-            }
-        }
-        public System.Windows.Forms.ToolStripComboBox ToolStripCLIVersionsDropDown
-        {
-            get
-            {
-                return toolStripCLIVersionsDropDown;
-            }
-        }
+        public virtual PacCLINugetFeed NugetFeed => this.nugetFeed;
+        public TextBox TextBoxCommand => textBoxCommandText;
+        public TextBox TextBoxOutput => textBoxOutput;
+        public System.Windows.Forms.ToolStripComboBox ToolStripCLIVersionsDropDown => toolStripCLIVersionsDropDown;
+        public ToolStripButton ToolStripRunButton => toolStripRunButton;
         /// <summary>
         /// Expands environment variables and, if unqualified, locates the exe in the working directory
         /// or the evironment's path.
@@ -642,7 +626,6 @@ namespace MikeFactorial.XTB.PACUI
                 UpdatePropertyGridProperties(e.Node.Nodes);
             }
             this.textBoxParentNodeHelp.Text = currentSelectedTag.HelpText;
-            toolStripRunButton.Enabled = (currentSelectedTag.Type == PacTag.PacTagType.Verb && !string.IsNullOrEmpty(textBoxCommandText.Text));
         }
 
         private void LoadChildNodes(TreeNode node, PacTag.PacTagType type, bool expand)
@@ -796,5 +779,10 @@ namespace MikeFactorial.XTB.PACUI
             });
         }
         #endregion
+
+        public void textBoxCommandText_TextChanged(object sender, EventArgs e)
+        {
+            toolStripRunButton.Enabled = textBoxCommandText.Text.StartsWith("pac ");
+        }
     }
 }
