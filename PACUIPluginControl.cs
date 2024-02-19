@@ -503,7 +503,7 @@ namespace MikeFactorial.XTB.PACUI
 
         public string UserName => "mikefactorial";
 
-        public string HelpUrl => "https://learn.microsoft.com/power-platform/developer/cli/introduction";
+        public string HelpUrl => "https://mikefactorial.com/?p=1366";
         #endregion
 
         #region Events
