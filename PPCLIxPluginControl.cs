@@ -601,7 +601,7 @@ namespace MikeFactorial.XTB.PPCLIx
             }
             catch (Exception ex)
             {
-                ShowErrorNotification($"An unexpected error occurred while loading the tool. Please try again or file an issue with the details of the error and the command you're trying to run.\n{ex.ToString()}", new Uri("https://github.com/mikefactorial/MikeFactorial.XTB.Plugins.PPCLIx/issues"), 32);
+                ShowErrorNotification($"An unexpected error occurred while loading the tool. Please try again or file an issue with the details of the error and the command you're trying to run.\n{ex.ToString()}", new Uri("https://github.com/mikefactorial/MikeFactorial.XTB.Plugins.PACUI/issues"), 32);
             }
             finally
             {
@@ -637,7 +637,7 @@ namespace MikeFactorial.XTB.PPCLIx
             }
             catch (Exception ex)
             {
-                ShowErrorNotification($"An error occurred while loading the selected CLI version. Please try again or file an issue with the details of the error and the command you're trying to run.\n{ex.ToString()}", new Uri("https://github.com/mikefactorial/MikeFactorial.XTB.Plugins.PPCLIx/issues"), 32);
+                ShowErrorNotification($"An error occurred while loading the selected CLI version. Please try again or file an issue with the details of the error and the command you're trying to run.\n{ex.ToString()}", new Uri("https://github.com/mikefactorial/MikeFactorial.XTB.Plugins.PACUI/issues"), 32);
             }
         }
         /// <summary>
@@ -672,7 +672,7 @@ namespace MikeFactorial.XTB.PPCLIx
             }
             catch (Exception ex)
             {
-                ShowErrorNotification($"An error occurred while loading the commands. Please try again or file an issue with the details of the error and the command you're trying to run.\n{ex.ToString()}", new Uri("https://github.com/mikefactorial/MikeFactorial.XTB.Plugins.PPCLIx/issues"), 32);
+                ShowErrorNotification($"An error occurred while loading the commands. Please try again or file an issue with the details of the error and the command you're trying to run.\n{ex.ToString()}", new Uri("https://github.com/mikefactorial/MikeFactorial.XTB.Plugins.PACUI/issues"), 32);
             }
         }
 
@@ -696,7 +696,7 @@ namespace MikeFactorial.XTB.PPCLIx
             }
             catch (Exception ex)
             {
-                ShowErrorNotification($"An error occurred while loading the commands. Please try again or file an issue with the details of the error and the command you're trying to run.\n{ex.ToString()}", new Uri("https://github.com/mikefactorial/MikeFactorial.XTB.Plugins.PPCLIx/issues"), 32);
+                ShowErrorNotification($"An error occurred while loading the commands. Please try again or file an issue with the details of the error and the command you're trying to run.\n{ex.ToString()}", new Uri("https://github.com/mikefactorial/MikeFactorial.XTB.Plugins.PACUI/issues"), 32);
             }
         }
         /// <summary>
@@ -734,7 +734,7 @@ namespace MikeFactorial.XTB.PPCLIx
             }
             catch (Exception ex)
             {
-                ShowErrorNotification($"An error occurred while running the command. Please try again or file an issue with the details of the error and the command you're trying to run.\n{ex.ToString()}", new Uri("https://github.com/mikefactorial/MikeFactorial.XTB.Plugins.PPCLIx/issues"), 32);
+                ShowErrorNotification($"An error occurred while running the command. Please try again or file an issue with the details of the error and the command you're trying to run.\n{ex.ToString()}", new Uri("https://github.com/mikefactorial/MikeFactorial.XTB.Plugins.PACUI/issues"), 32);
             }
             finally
             {
