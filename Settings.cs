@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MikeFactorial.XTB.PACUI
+namespace MikeFactorial.XTB.PPCLIx
 {
     /// <summary>
     /// This class can help you to store settings for your plugin

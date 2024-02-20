@@ -1,8 +1,8 @@
 ﻿using System.Windows.Forms;
 
-namespace MikeFactorial.XTB.PACUI
+namespace MikeFactorial.XTB.PPCLIx
 {
-    partial class PACUIPluginControl
+    partial class PPCLIxPluginControl
     {
         /// <summary> 
         /// Variable nécessaire au concepteur.
@@ -30,7 +30,7 @@ namespace MikeFactorial.XTB.PACUI
         /// </summary>
         public void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PACUIPluginControl));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PPCLIxPluginControl));
             this.toolStripMenu = new System.Windows.Forms.ToolStrip();
             this.toolStripPacVersionLabel = new System.Windows.Forms.ToolStripLabel();
             this.toolStripCLIVersionsDropDown = new System.Windows.Forms.ToolStripComboBox();
@@ -51,7 +51,7 @@ namespace MikeFactorial.XTB.PACUI
             this.textBoxParentNodeHelp = new System.Windows.Forms.TextBox();
             this.groupBoxOutput = new System.Windows.Forms.GroupBox();
             this.textBoxOutput = new System.Windows.Forms.TextBox();
-            this.propertyGrid1 = new MikeFactorial.XTB.PACUI.PropertyGridEx();
+            this.propertyGrid1 = new MikeFactorial.XTB.PPCLIx.PropertyGridEx();
             this.toolStripMenu.SuspendLayout();
             this.groupCommandArgs.SuspendLayout();
             this.groupTree.SuspendLayout();
@@ -247,7 +247,7 @@ namespace MikeFactorial.XTB.PACUI
             this.propertyGrid1.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid1_PropertyValueChanged);
             this.propertyGrid1.SelectedGridItemChanged += new System.Windows.Forms.SelectedGridItemChangedEventHandler(this.propertyGrid1_SelectedGridItemChanged);
             // 
-            // PACUIPluginControl
+            // PPCLIxPluginControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -257,7 +257,7 @@ namespace MikeFactorial.XTB.PACUI
             this.Controls.Add(this.groupTree);
             this.Controls.Add(this.groupCommandArgs);
             this.Controls.Add(this.toolStripMenu);
-            this.Name = "PACUIPluginControl";
+            this.Name = "PPCLIxPluginControl";
             this.PluginIcon = ((System.Drawing.Icon)(resources.GetObject("$this.PluginIcon")));
             this.Size = new System.Drawing.Size(989, 509);
             this.TabIcon = ((System.Drawing.Image)(resources.GetObject("$this.TabIcon")));

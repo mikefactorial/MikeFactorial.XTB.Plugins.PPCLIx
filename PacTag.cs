@@ -11,7 +11,7 @@ using System.Web.UI.Design.WebControls;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
 
-namespace MikeFactorial.XTB.PACUI
+namespace MikeFactorial.XTB.PPCLIx
 {
     internal class PacTagListPropertyGridAdapter : ICustomTypeDescriptor
     {

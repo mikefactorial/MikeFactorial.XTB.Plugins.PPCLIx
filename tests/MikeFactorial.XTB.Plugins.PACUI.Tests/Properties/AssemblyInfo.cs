@@ -2,11 +2,11 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("MikeFactorial.XTB.Plugins.PACUI.Tests")]
+[assembly: AssemblyTitle("MikeFactorial.XTB.Plugins.PPCLIx.Tests")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("MikeFactorial.XTB.Plugins.PACUI.Tests")]
+[assembly: AssemblyProduct("MikeFactorial.XTB.Plugins.PPCLIx.Tests")]
 [assembly: AssemblyCopyright("Copyright ©  2024")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

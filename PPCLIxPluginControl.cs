@@ -18,10 +18,11 @@ using System.Reflection;
 using XrmToolBox.Extensibility.Interfaces;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
 using NuGet.Protocol.Plugins;
+using System.Xml.Linq;
 
-namespace MikeFactorial.XTB.PACUI
+namespace MikeFactorial.XTB.PPCLIx
 {
-    public partial class PACUIPluginControl : PluginControlBase, IGitHubPlugin, IHelpPlugin
+    public partial class PPCLIxPluginControl : PluginControlBase, IGitHubPlugin, IHelpPlugin
     {
         private PacCLINugetFeed nugetFeed = new PacCLINugetFeed();
         private Settings mySettings;
@@ -31,11 +32,11 @@ namespace MikeFactorial.XTB.PACUI
         private PacTag currentSelectedTag = null;
         private TreeNode mainNode = null;
 
-        public PACUIPluginControl(PacCLINugetFeed feed) : this()
+        public PPCLIxPluginControl(PacCLINugetFeed feed) : this()
         {
             nugetFeed = feed;
         }
-        public PACUIPluginControl()
+        public PPCLIxPluginControl()
         {
             InitializeComponent();
         }
@@ -44,7 +45,7 @@ namespace MikeFactorial.XTB.PACUI
         #region Properties
         public ToolStripComboBox ToolStripCLIVersionsDropDown => toolStripCLIVersionsDropDown;
         public TreeView TreePacCommands => treePacCommands;
-        public string RepositoryName => "MikeFactorial.XTB.Plugins.PACUI";
+        public string RepositoryName => "MikeFactorial.XTB.Plugins.PPCLIx";
         public string UserName => "mikefactorial";
         public string HelpUrl => "https://mikefactorial.com/?p=1366";
         public virtual PacCLINugetFeed NugetFeed => this.nugetFeed;
@@ -191,13 +192,16 @@ namespace MikeFactorial.XTB.PACUI
         /// <param name="connection">The connection to try and sync with the PAC Auth</param>
         private void SyncPacAuthWithConnection(ConnectionDetail connection)
         {
-            LoadPacAuthorizationProfiles();
             bool connectionUpdated = false;
-            foreach (object auth in this.toolStripDropDownButton1.DropDownItems)
+            LoadPacAuthorizationProfiles();
+            if (connection != null)
             {
-                if (auth is ToolStripMenuItem && ((ToolStripMenuItem)auth).Name.ToLower().Contains(connection.WebApplicationUrl.ToLower()))
+                foreach (object auth in this.toolStripDropDownButton1.DropDownItems)
                 {
-                    connectionUpdated = SyncPacAuthWithSelectedWorker(((ToolStripMenuItem)auth).Name, $"An existing authentication profile was found for the current connection. The authentication profile has been selected to use for future commands.");
+                    if (auth is ToolStripMenuItem && ((ToolStripMenuItem)auth).Name.ToLower().Contains(connection.WebApplicationUrl.ToLower()))
+                    {
+                        connectionUpdated = SyncPacAuthWithSelectedWorker(((ToolStripMenuItem)auth).Name, $"An existing authentication profile was found for the current connection. The authentication profile has been selected to use for future commands.");
+                    }
                 }
             }
 
@@ -206,32 +210,39 @@ namespace MikeFactorial.XTB.PACUI
                 var authNode = mainNode.Nodes.OfType<TreeNode>().ToList().FirstOrDefault(n => n.Text == "auth");
                 if (authNode != null)
                 {
-                    LoadChildNodesWorker(authNode, PacTag.PacTagType.Noun, false);
+                    string command = $"auth help";
+                    string results = ExecutePacCommand(command, false);
+                    LoadChildNodes(results, authNode, PacTag.PacTagType.Noun, false);
                     var createNode = authNode.Nodes.OfType<TreeNode>().ToList().FirstOrDefault(n => n.Text == "create");
                     if (createNode != null)
                     {
-                        LoadChildNodesWorker(createNode, PacTag.PacTagType.Verb, false);
+                        command = $"auth create help";
+                        results = ExecutePacCommand(command, false);
+                        LoadChildNodes(results, createNode, PacTag.PacTagType.Verb, false);
                         treePacCommands.SelectedNode = createNode;
                         foreach (TreeNode argNode in createNode.Nodes)
                         {
-                            if (((PacTag)argNode.Tag).Name == "--name")
+                            if (argNode.Tag != null && connection != null)
                             {
-                                ((PacTag)argNode.Tag).Value = connection.ConnectionName;
+                                if (((PacTag)argNode.Tag).Name == "--name")
+                                {
+                                    ((PacTag)argNode.Tag).Value = connection.ConnectionName;
+                                }
+                                else if (((PacTag)argNode.Tag).Name == "--username")
+                                {
+                                    ((PacTag)argNode.Tag).Value = connection.UserName;
+                                }
+                                else if (((PacTag)argNode.Tag).Name == "--environment")
+                                {
+                                    ((PacTag)argNode.Tag).Value = connection.WebApplicationUrl;
+                                }
+                                /*
+                                else if (((PacTag)argNode.Tag).Name == "--applicationId")
+                                {
+                                    ((PacTag)argNode.Tag).Value = connection.AzureAdAppId;
+                                }
+                                */
                             }
-                            else if (((PacTag)argNode.Tag).Name == "--username")
-                            {
-                                ((PacTag)argNode.Tag).Value = connection.UserName;
-                            }
-                            else if (((PacTag)argNode.Tag).Name == "--environment")
-                            {
-                                ((PacTag)argNode.Tag).Value = connection.WebApplicationUrl;
-                            }
-                            /*
-                            else if (((PacTag)argNode.Tag).Name == "--applicationId")
-                            {
-                                ((PacTag)argNode.Tag).Value = connection.AzureAdAppId;
-                            }
-                            */
                         }
                     }
                 }
@@ -355,6 +366,41 @@ namespace MikeFactorial.XTB.PACUI
                 }
             }
         }
+        private void LoadChildNodes(string helpResults, TreeNode node, PacTag.PacTagType type, bool expand)
+        {
+            ((PacTag)node.Tag).HelpText = helpResults.Trim();
+            node.Nodes.Clear();
+            foreach (var newNodeText in PacCommands.RetrieveUsageDetails(helpResults))
+            {
+                var actionNode = new TreeNode(newNodeText);
+                var helpText = PacCommands.RetrieveNodeHelpText(helpResults, newNodeText);
+                actionNode.Tag = new PacTag(ref actionNode)
+                {
+                    Type = PacTag.PacTagType.Verb,
+                    Name = newNodeText,
+                    Value = PacCommands.GetDefaultArgumentValue(helpText),
+                    HelpText = helpText
+
+                };
+                if (type == PacTag.PacTagType.Noun)
+                {
+                    actionNode.Nodes.Add(new TreeNode());
+                }
+                node.Nodes.Add(actionNode);
+            }
+            if (expand)
+            {
+                node.Expand();
+            }
+            if (type == PacTag.PacTagType.Verb)
+            {
+                UpdatePropertyGridProperties(node.Nodes);
+            }
+            if (node.Tag != null)
+            {
+                this.textBoxParentNodeHelp.Text = ((PacTag)node.Tag).HelpText;
+            }
+        }
         #endregion
 
         #region Worker Methods
@@ -385,38 +431,7 @@ namespace MikeFactorial.XTB.PACUI
                     }
                     else
                     {
-                        ((PacTag)node.Tag).HelpText = results.Trim();
-                        node.Nodes.Clear();
-                        foreach (var newNodeText in PacCommands.RetrieveUsageDetails(results))
-                        {
-                            var actionNode = new TreeNode(newNodeText);
-                            var helpText = PacCommands.RetrieveNodeHelpText(results, newNodeText);
-                            actionNode.Tag = new PacTag(ref actionNode)
-                            {
-                                Type = PacTag.PacTagType.Verb,
-                                Name = newNodeText,
-                                Value = PacCommands.GetDefaultArgumentValue(helpText),
-                                HelpText = helpText
-
-                            };
-                            if (type == PacTag.PacTagType.Noun)
-                            {
-                                actionNode.Nodes.Add(new TreeNode());
-                            }
-                            node.Nodes.Add(actionNode);
-                        }
-                        if (expand)
-                        {
-                            node.Expand();
-                        }
-                        if (type == PacTag.PacTagType.Verb)
-                        {
-                            UpdatePropertyGridProperties(node.Nodes);
-                        }
-                        if (node.Tag != null)
-                        {
-                            this.textBoxParentNodeHelp.Text = ((PacTag)node.Tag).HelpText;
-                        }
+                        LoadChildNodes(results, node, type, expand);
                     }
                 }
             });
@@ -543,7 +558,7 @@ namespace MikeFactorial.XTB.PACUI
                                 }
                             }
                             mainNode.Expand();
-                            if (this.ConnectionDetail != null && syncConnection)
+                            if (syncConnection)
                             {
                                 SyncPacAuthWithConnection(this.ConnectionDetail);
                             }
@@ -586,7 +601,7 @@ namespace MikeFactorial.XTB.PACUI
             }
             catch (Exception ex)
             {
-                ShowErrorNotification($"An unexpected error occurred while loading the tool. Please try again or file an issue with the details of the error and the command you're trying to run.\n{ex.ToString()}", new Uri("https://github.com/mikefactorial/MikeFactorial.XTB.Plugins.PACUI/issues"), 32);
+                ShowErrorNotification($"An unexpected error occurred while loading the tool. Please try again or file an issue with the details of the error and the command you're trying to run.\n{ex.ToString()}", new Uri("https://github.com/mikefactorial/MikeFactorial.XTB.Plugins.PPCLIx/issues"), 32);
             }
             finally
             {
@@ -622,7 +637,7 @@ namespace MikeFactorial.XTB.PACUI
             }
             catch (Exception ex)
             {
-                ShowErrorNotification($"An error occurred while loading the selected CLI version. Please try again or file an issue with the details of the error and the command you're trying to run.\n{ex.ToString()}", new Uri("https://github.com/mikefactorial/MikeFactorial.XTB.Plugins.PACUI/issues"), 32);
+                ShowErrorNotification($"An error occurred while loading the selected CLI version. Please try again or file an issue with the details of the error and the command you're trying to run.\n{ex.ToString()}", new Uri("https://github.com/mikefactorial/MikeFactorial.XTB.Plugins.PPCLIx/issues"), 32);
             }
         }
         /// <summary>
@@ -657,7 +672,7 @@ namespace MikeFactorial.XTB.PACUI
             }
             catch (Exception ex)
             {
-                ShowErrorNotification($"An error occurred while loading the commands. Please try again or file an issue with the details of the error and the command you're trying to run.\n{ex.ToString()}", new Uri("https://github.com/mikefactorial/MikeFactorial.XTB.Plugins.PACUI/issues"), 32);
+                ShowErrorNotification($"An error occurred while loading the commands. Please try again or file an issue with the details of the error and the command you're trying to run.\n{ex.ToString()}", new Uri("https://github.com/mikefactorial/MikeFactorial.XTB.Plugins.PPCLIx/issues"), 32);
             }
         }
 
@@ -681,7 +696,7 @@ namespace MikeFactorial.XTB.PACUI
             }
             catch (Exception ex)
             {
-                ShowErrorNotification($"An error occurred while loading the commands. Please try again or file an issue with the details of the error and the command you're trying to run.\n{ex.ToString()}", new Uri("https://github.com/mikefactorial/MikeFactorial.XTB.Plugins.PACUI/issues"), 32);
+                ShowErrorNotification($"An error occurred while loading the commands. Please try again or file an issue with the details of the error and the command you're trying to run.\n{ex.ToString()}", new Uri("https://github.com/mikefactorial/MikeFactorial.XTB.Plugins.PPCLIx/issues"), 32);
             }
         }
         /// <summary>
@@ -719,7 +734,7 @@ namespace MikeFactorial.XTB.PACUI
             }
             catch (Exception ex)
             {
-                ShowErrorNotification($"An error occurred while running the command. Please try again or file an issue with the details of the error and the command you're trying to run.\n{ex.ToString()}", new Uri("https://github.com/mikefactorial/MikeFactorial.XTB.Plugins.PACUI/issues"), 32);
+                ShowErrorNotification($"An error occurred while running the command. Please try again or file an issue with the details of the error and the command you're trying to run.\n{ex.ToString()}", new Uri("https://github.com/mikefactorial/MikeFactorial.XTB.Plugins.PPCLIx/issues"), 32);
             }
             finally
             {

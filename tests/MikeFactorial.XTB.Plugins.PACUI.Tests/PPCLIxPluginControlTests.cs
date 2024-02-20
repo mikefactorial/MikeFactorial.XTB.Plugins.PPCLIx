@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudio.TestTools.UnitTesting.Logging;
-using MikeFactorial.XTB.PACUI;
+using MikeFactorial.XTB.PPCLIx;
 using Moq;
 using NuGet.Common;
 using NuGet.Packaging;
@@ -18,12 +18,12 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Windows.Forms.Control;
 
-namespace MikeFactorial.XTB.Plugins.PACUI.Tests
+namespace MikeFactorial.XTB.Plugins.PPCLIx.Tests
 {
     [TestClass]
-    public class PACUIPluginControlTests
+    public class PPCLIxPluginControlTests
     {
-        private PACUIPluginControl control = null;
+        private PPCLIxPluginControl control = null;
         private List<NuGetVersion> versions = null;
         [TestInitialize]
         public void Init()
@@ -51,7 +51,7 @@ namespace MikeFactorial.XTB.Plugins.PACUI.Tests
             nugetFeed.Setup(n => n.Versions).Returns(versions);
             nugetFeed.Setup(n => n.Resource).Returns(resource.Object);
             nugetFeed.Setup(n => n.Repository).Returns(repository);
-            control = new PACUIPluginControl(nugetFeed.Object);
+            control = new PPCLIxPluginControl(nugetFeed.Object);
             form.Controls.Add(control);
 
         }

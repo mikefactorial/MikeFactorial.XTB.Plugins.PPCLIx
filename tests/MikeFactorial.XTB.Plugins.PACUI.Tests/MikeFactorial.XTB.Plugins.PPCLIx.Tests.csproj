@@ -8,8 +8,8 @@
     <ProjectGuid>{F1A82076-6B5C-4A74-9014-FA15612AA7FD}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MikeFactorial.XTB.Plugins.PACUI.Tests</RootNamespace>
-    <AssemblyName>MikeFactorial.XTB.Plugins.PACUI.Tests</AssemblyName>
+    <RootNamespace>MikeFactorial.XTB.Plugins.PPCLIx.Tests</RootNamespace>
+    <AssemblyName>MikeFactorial.XTB.Plugins.PPCLIx.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -115,7 +115,7 @@
     <Reference Include="XrmToolBox.Extensibility, Version=1.2023.10.67, Culture=neutral, PublicKeyToken=null" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PACUIPluginControlTests.cs" />
+    <Compile Include="PPCLIxPluginControlTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -125,9 +125,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\MikeFactorial.XTB.Plugins.PACUI.csproj">
+    <ProjectReference Include="..\..\MikeFactorial.XTB.Plugins.PPCLIx.csproj">
       <Project>{A4811599-87A7-4EE1-BC6F-CD3BBE9967AE}</Project>
-      <Name>MikeFactorial.XTB.Plugins.PACUI</Name>
+      <Name>MikeFactorial.XTB.Plugins.PPCLIx</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />

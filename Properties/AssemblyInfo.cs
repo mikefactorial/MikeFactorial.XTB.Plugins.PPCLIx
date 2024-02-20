@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("PAC UI for XrmToolBox by Mike!")]
+[assembly: AssemblyTitle("Power Platform CLIx for XrmToolBox by Mike!")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Mike!")]
-[assembly: AssemblyProduct("PAC UI")]
+[assembly: AssemblyProduct("Power Platform CLIx")]
 [assembly: AssemblyCopyright("Copyright © Michael Ochs 2024")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

@@ -7,12 +7,12 @@ using System.Reflection;
 using XrmToolBox.Extensibility;
 using XrmToolBox.Extensibility.Interfaces;
 
-namespace MikeFactorial.XTB.PACUI
+namespace MikeFactorial.XTB.PPCLIx
 {
     // Do not forget to update version number and author (company attribute) in AssemblyInfo.cs class
     // To generate Base64 string for Images below, you can use https://www.base64-image.de/
     [Export(typeof(IXrmToolBoxPlugin)),
-        ExportMetadata("Name", "PAC UI"),
+        ExportMetadata("Name", "Power Platform CLIx"),
         ExportMetadata("Description", "A user interface for exploring and executing Power Platform CLI Commands"),
         // Please specify the base64 content of a 32x32 pixels image
         ExportMetadata("SmallImageBase64", "/9j/4AAQSkZJRgABAQEAYABgAAD/4QBGRXhpZgAATU0AKgAAAAgABAESAAMAAAABAAEAAFEQAAEAAAABAQAAAFERAAQAAAABAAAAAFESAAQAAAABAAAAAAAAAAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAgMDAwYDAwYMCAcIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCAAgACADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD88f2YP2cNa/aRv7fwpp9la2k4tftM1zdTpbosYDuHaQjgFY26ZzgADmvpbwl/wRI+J3xE8YWulaXdeC9Y1S4Eix2n9uxbplRckZYAYRUYjkdPoK85/wCCcuiw+Mvizp+nPbzXn2qbSrRLJAzNeOxmUWwaORWTzdxQuGUp5hPGMV+oPwr/AGOfD3xMs9Ke38H6LqWreMrSPWoNNtl1eXTPAejzSSBLzU7n7XG88oW3uEigjZWndM/Kis4+mr1ORX/T/gnzNGnztr+vyZ8OeO/+Dej46fDfw5Bea9B4a02zkvrazjnfXLeQNPNOkcKFUyfmdlXPRQckgAkfJv7TP7O2sfs4TR+GNQsre5kvdNi1KyubeZZllt5oorhJA+AceVLG2GCsNzAqCDX7BXnwI+Cvi/8AZ01LXNDstNkVrLUda8FfEHw9cauuieM30wTtd6RdWd1cs1pcH7PMpQSHzY4nlhcFWQfmr/wUn0K38K/G3UtPXTZLFrOfV4fsD72bS3Uwo1uXkkZn8riMSMzM+wHnOKmhUc73/K36sdamoWt+d/0RX/4JrXuhj4zeG59evtPtdDutb0S3u5dRu1itlCTMJFMpKjAXDNzlQw6cV+jvxM8eWPhy0vtG8N61cXnhe4+1aDFbP41jiul0mB/9HtZ57G/hS4tfMmuZIPMTzEWeVC8iGvyO/Zv/AGvPGH7M3h64fwprBs/tce6ddi7wSUVgrKwYKdqEqcr8g4zye1+Jf7fXjX4mfYbfxNqWk+ILTT2adRe6e8/2WUgISg83vkqT6Y9qupTc2uxNOahfufp+fineeIdL8O+F77xDodxoetWD2Cte68txZ+DvtYnsZp0t/t4hFxFbSSMHdTtWc4AJJP5zf8FT7/QoP2iPFj+Fb6xvPD9v4h16zsrrTbtLi1EbXCeWPNDMpDqp28ksCSM4Jrkvh7+3f4/+EthdSeHJtB0E6pKiXS6dbmIzOvyxs6iUkhQ/tzuHXmuT/aO/a98WftNeE7VvFmtSXkluhaCIRDdhSQgeRmZto3S4UYUEk4JIImlRcJX6DqVFNI//2Q=="),
@@ -21,17 +21,17 @@ namespace MikeFactorial.XTB.PACUI
         ExportMetadata("BackgroundColor", "Lavender"),
         ExportMetadata("PrimaryFontColor", "Black"),
         ExportMetadata("SecondaryFontColor", "Gray")]
-    public class PACUIPlugin : PluginBase
+    public class PPCLIxPlugin : PluginBase
     {
         public override IXrmToolBoxPluginControl GetControl()
         {
-            return new PACUIPluginControl();
+            return new PPCLIxPluginControl();
         }
 
         /// <summary>
         /// Constructor 
         /// </summary>
-        public PACUIPlugin()
+        public PPCLIxPlugin()
         {
             // If you have external assemblies that you need to load, uncomment the following to 
             // hook into the event that will fire when an Assembly fails to resolve
