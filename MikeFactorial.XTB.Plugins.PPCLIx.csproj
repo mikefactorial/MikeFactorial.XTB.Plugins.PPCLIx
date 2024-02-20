@@ -244,9 +244,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Images\PACUIImage.jpg" />
-    <Content Include="Images\PACUIImage32x32.jpg" />
-    <Content Include="Images\PACUIImage80x80.jpg" />
+    <Content Include="Images\PPCLIxImage.jpg" />
+    <Content Include="Images\PPCLIxImage32x32.jpg" />
+    <Content Include="Images\PPCLIxImage80x80.jpg" />
     <Content Include="Images\Play.png" />
     <Content Include="Images\Plug.png" />
     <Content Include="Images\Screenshot.png" />
