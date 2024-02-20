@@ -219,6 +219,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="PacCLINugetFeed.cs" />
+    <Compile Include="PacCommands.cs" />
     <Compile Include="PacTag.cs" />
     <Compile Include="PACUIPlugin.cs" />
     <Compile Include="PACUIPluginControl.cs">

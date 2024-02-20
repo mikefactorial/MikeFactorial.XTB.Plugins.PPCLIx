@@ -87,7 +87,7 @@ namespace MikeFactorial.XTB.PACUI
             // 
             this.toolStripCLIVersionsDropDown.Name = "toolStripCLIVersionsDropDown";
             this.toolStripCLIVersionsDropDown.Size = new System.Drawing.Size(121, 31);
-            this.toolStripCLIVersionsDropDown.SelectedIndexChanged += new System.EventHandler(this.toolStripCLIVersionsDropDown_SelectedIndexChanged);
+            this.toolStripCLIVersionsDropDown.SelectedIndexChanged += new System.EventHandler(this.ToolStripCLIVersionsDropDown_SelectedIndexChanged);
             // 
             // toolStripSeparator1
             // 
@@ -170,7 +170,7 @@ namespace MikeFactorial.XTB.PACUI
             this.treePacCommands.Size = new System.Drawing.Size(314, 459);
             this.treePacCommands.TabIndex = 7;
             this.treePacCommands.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.TreePacCommands_BeforeExpand);
-            this.treePacCommands.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treePacCommands_AfterSelect);
+            this.treePacCommands.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreePacCommands_AfterSelect);
             // 
             // groupCommandArea
             // 

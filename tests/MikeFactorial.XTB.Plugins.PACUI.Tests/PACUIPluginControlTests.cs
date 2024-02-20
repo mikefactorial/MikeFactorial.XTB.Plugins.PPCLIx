@@ -31,7 +31,7 @@ namespace MikeFactorial.XTB.Plugins.PACUI.Tests
             Form form = new Form();
             Mock<PacCLINugetFeed> nugetFeed = new Mock<PacCLINugetFeed>();
             versions = new List<NuGetVersion>();
-            versions.Add(new NuGetVersion("1.0.0"));
+            versions.Add(new NuGetVersion("1.30.7"));
 
             Mock<FindPackageByIdResource> resource = new Mock<FindPackageByIdResource>();
             resource.Setup(r => r.CopyNupkgToStreamAsync(It.IsAny<string>(), It.IsAny<NuGetVersion>(), It.IsAny<Stream>(), It.IsAny<SourceCacheContext>(), It.IsAny<ILogger>(), It.IsAny<CancellationToken>()))
@@ -52,6 +52,8 @@ namespace MikeFactorial.XTB.Plugins.PACUI.Tests
             nugetFeed.Setup(n => n.Resource).Returns(resource.Object);
             nugetFeed.Setup(n => n.Repository).Returns(repository);
             control = new PACUIPluginControl(nugetFeed.Object);
+            form.Controls.Add(control);
+
         }
         [TestMethod]
         public void CheckRunEnabled()
@@ -68,20 +70,38 @@ namespace MikeFactorial.XTB.Plugins.PACUI.Tests
         [TestMethod]
         public void LoadVersionsTest()
         {
+            control.TreePacCommands.BeforeExpand -= control.TreePacCommands_BeforeExpand;
+            control.TreePacCommands.AfterSelect -= control.TreePacCommands_AfterSelect;
+            control.ToolStripCLIVersionsDropDown.SelectedIndexChanged -= control.ToolStripCLIVersionsDropDown_SelectedIndexChanged;
+
             control.UpdatePacVersions();
             Assert.AreEqual(versions.Count, control.ToolStripCLIVersionsDropDown.Items.Count);
+
+            control.TreePacCommands.BeforeExpand += control.TreePacCommands_BeforeExpand;
+            control.TreePacCommands.AfterSelect += control.TreePacCommands_AfterSelect;
+            control.ToolStripCLIVersionsDropDown.SelectedIndexChanged += control.ToolStripCLIVersionsDropDown_SelectedIndexChanged;
+
         }
 
         [TestMethod]
         public async Task InstallSelectedPacVersionTest()
         {
+            control.TreePacCommands.BeforeExpand -= control.TreePacCommands_BeforeExpand;
+            control.TreePacCommands.AfterSelect -= control.TreePacCommands_AfterSelect;
+            control.ToolStripCLIVersionsDropDown.SelectedIndexChanged -= control.ToolStripCLIVersionsDropDown_SelectedIndexChanged;
+
             if (Directory.Exists("./microsoft.powerapps.cli.1.30.7"))
             {
                 Directory.Delete("./microsoft.powerapps.cli.1.30.7", true);
             }
             control.UpdatePacVersions();
-            await control.InstallSelectedPacVersion();
+            await control.InstallSelectedPacVersion(control.NugetFeed.Versions.FirstOrDefault(v => v.OriginalVersion == "1.30.7"));
             Assert.IsTrue(Directory.Exists("./microsoft.powerapps.cli.1.30.7"));
+
+            control.TreePacCommands.BeforeExpand += control.TreePacCommands_BeforeExpand;
+            control.TreePacCommands.AfterSelect += control.TreePacCommands_AfterSelect;
+            control.ToolStripCLIVersionsDropDown.SelectedIndexChanged += control.ToolStripCLIVersionsDropDown_SelectedIndexChanged;
+
         }
     }
 }
