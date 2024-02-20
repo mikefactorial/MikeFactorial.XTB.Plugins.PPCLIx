@@ -249,6 +249,7 @@
     <Content Include="Images\PACUIImage80x80.jpg" />
     <Content Include="Images\Play.png" />
     <Content Include="Images\Plug.png" />
+    <Content Include="Images\Screenshot.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="PACUIPluginControl.resx">
