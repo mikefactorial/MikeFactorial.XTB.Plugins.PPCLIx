@@ -1,5 +1,6 @@
 ﻿using McTools.Xrm.Connection;
 using Microsoft.Xrm.Sdk;
+using ScintillaNET;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -215,71 +216,35 @@ namespace MikeFactorial.XTB.PPCLIx
                 }
             }
         }
-        /// <summary>
-        /// Load the default and pac authorization profiles into the auth menu
-        /// </summary>
-        private void LoadPacAuthorizationProfiles()
+        private void LoadDefaultAuthorizationItems()
         {
-            if(this.InvokeRequired)
+            this.toolStripConnectionDropDown.DropDownItems.Clear();
+            this.toolStripConnectionDropDown.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[]
             {
-                this.Invoke(new MethodInvoker(delegate
+                this.refreshCLIAuthToolStripMenuItem,
+                this.toolStripSeparator3,
+                this.syncCLIAuthWithCurrentConnectionToolStripMenuItem,
+                this.toolStripSeparator3
+            });
+        }
+        private void LoadExistingAuthorizationItems(string authList)
+        {
+            foreach (var auth in authList.Split('\n'))
+            {
+                if (auth.Trim().StartsWith("["))
                 {
-                    this.toolStripConnectionDropDown.DropDownItems.Clear();
-                    this.toolStripConnectionDropDown.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[]
+                    string menuItemName = auth.Replace("*", "");
+                    //Create connection menu item for this auth
+                    ToolStripMenuItem connectionItem = new ToolStripMenuItem();
+                    connectionItem.Name = menuItemName;
+                    connectionItem.Text = menuItemName;
+                    connectionItem.CheckOnClick = true;
+                    if (auth.Contains(" * "))
                     {
-                        this.syncCLIAuthWithCurrentConnectionToolStripMenuItem,
-                        this.toolStripSeparator3
-                    });
-                }));
-            }
-            else
-            {
-                this.toolStripConnectionDropDown.DropDownItems.Clear();
-                this.toolStripConnectionDropDown.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[]
-                {
-                        this.syncCLIAuthWithCurrentConnectionToolStripMenuItem,
-                        this.toolStripSeparator3
-                });
-            }
-            string authlist = ExecutePacCommand("auth list", false);
-
-            if (this.InvokeRequired)
-            {
-                this.Invoke(new MethodInvoker(delegate
-                {
-                    foreach (var auth in authlist.Split('\n'))
-                    {
-                        if (auth.Trim().StartsWith("["))
-                        {
-                            string menuItemName = auth.Replace("*", "");
-                            //Create connection menu item for this auth
-                            ToolStripMenuItem connectionItem = new ToolStripMenuItem();
-                            connectionItem.Name = menuItemName;
-                            connectionItem.Text = menuItemName;
-                            connectionItem.CheckOnClick = true;
-                            if (auth.Contains(" * "))
-                            {
-                                connectionItem.Checked = true;
-                            }
-                            connectionItem.Click += new System.EventHandler(this.syncCLIAuthWithCurrentConnectionToolStripMenuItem_Click);
-                            this.toolStripConnectionDropDown.DropDownItems.Add(connectionItem);
-                        }
+                        connectionItem.Checked = true;
                     }
-                }));
-            }
-            else
-            {
-                foreach (var auth in authlist.Split('\n'))
-                {
-                    if (auth.Trim().StartsWith("["))
-                    {
-                        //Create connection menu item for this auth
-                        ToolStripMenuItem connectionItem = new ToolStripMenuItem();
-                        connectionItem.Name = auth;
-                        connectionItem.Text = auth;
-                        connectionItem.Click += new System.EventHandler(this.syncCLIAuthWithCurrentConnectionToolStripMenuItem_Click);
-                        this.toolStripConnectionDropDown.DropDownItems.Add(connectionItem);
-                    }
+                    connectionItem.Click += new System.EventHandler(this.syncCLIAuthWithCurrentConnectionToolStripMenuItem_Click);
+                    this.toolStripConnectionDropDown.DropDownItems.Add(connectionItem);
                 }
             }
         }
@@ -349,9 +314,26 @@ namespace MikeFactorial.XTB.PPCLIx
             }
             mainNode.Expand();
         }
+        /// <summary>
+        /// Load the default and pac authorization profiles into the auth menu
+        /// </summary>
+        private void LoadPacAuthorizationProfiles()
+        {
+            this.Invoke(new MethodInvoker(delegate
+            {
+                LoadDefaultAuthorizationItems();
+            }));
+            string authlist = ExecutePacCommand("auth list", false);
+            this.Invoke(new MethodInvoker(delegate
+            {
+                LoadExistingAuthorizationItems(authlist);
+            }));
+        }
+
         #endregion
 
         #region Worker Methods
+
         /// <summary>
         /// JIT loads child nodes when the user selects or expands a node
         /// </summary>
@@ -369,19 +351,16 @@ namespace MikeFactorial.XTB.PPCLIx
                 Work = (worker, args) =>
                 {
                     results = ExecutePacCommand(command, false);
-                    if (this.InvokeRequired)
+                    this.Invoke(new MethodInvoker(delegate
                     {
-                        this.Invoke(new MethodInvoker(delegate
-                        {
-                            LoadChildNodes(results, node, type, expand);
-                        }));
-                    }
+                        LoadChildNodes(results, node, type, expand);
+                    }));
                 },
                 PostWorkCallBack = (args) =>
                 {
                     if (args.Error != null)
                     {
-                        ShowErrorNotification("An error occurred when trying to set the command line authorization. Try running 'Sync CLI Auth with Current Connection' or run 'pac auth select' from the command line to run commands against your environment.", null);
+                        ShowErrorNotification("An error occurred when trying to load the Power Platform commands. Try running 'Sync CLI Auth with Current Connection' or run 'pac auth select' from the command line to run commands against your environment.", null);
                         return;
                     }
                 }
@@ -408,11 +387,18 @@ namespace MikeFactorial.XTB.PPCLIx
                         {
                             foreach (object auth in this.toolStripConnectionDropDown.DropDownItems)
                             {
-                                if (auth is ToolStripMenuItem && ((ToolStripMenuItem)auth).Name.ToLower().Contains(connection.WebApplicationUrl.ToLower()))
+                                if (auth is ToolStripMenuItem)
                                 {
-                                    SyncPacAuthWithSelectedWorker(((ToolStripMenuItem)auth).Name, $"An existing authentication profile was found for the current connection. The authentication profile has been selected to use for future commands.");
-                                    connectionUpdated = true;
-                                    break;
+                                    if (((ToolStripMenuItem)auth).Name.ToLower().Contains(connection.WebApplicationUrl.ToLower()))
+                                    {
+                                        ((ToolStripMenuItem)auth).Checked = true;
+                                        SyncPacAuthWithSelectedWorker(((ToolStripMenuItem)auth).Name, $"An existing authentication profile was found for the current connection. The authentication profile has been selected to use for future commands.");
+                                        connectionUpdated = true;
+                                    }
+                                    else
+                                    {
+                                        ((ToolStripMenuItem)auth).Checked = false;
+                                    }
                                 }
                             }
                         }));
@@ -425,14 +411,22 @@ namespace MikeFactorial.XTB.PPCLIx
                         {
                             string command = $"auth help";
                             string results = ExecutePacCommand(command, false);
-                            LoadChildNodes(results, authNode, PacTag.PacTagType.Noun, false);
+                            this.Invoke(new MethodInvoker(delegate
+                            {
+                                LoadChildNodes(results, authNode, PacTag.PacTagType.Noun, false);
+                            }));
                             var createNode = authNode.Nodes.OfType<TreeNode>().ToList().FirstOrDefault(n => n.Text == "create");
                             if (createNode != null)
                             {
                                 command = $"auth create help";
                                 results = ExecutePacCommand(command, false);
-                                LoadChildNodes(results, createNode, PacTag.PacTagType.Verb, false);
-                                treePacCommands.SelectedNode = createNode;
+                                this.Invoke(new MethodInvoker(delegate
+                                {
+                                    LoadChildNodes(results, createNode, PacTag.PacTagType.Verb, false);
+                                    treePacCommands.SelectedNode = createNode;
+                                    ShowInfoNotification("No existing authentication profile could be found for the current connection. Use pac auth create to create a new authentication prfoile. We've prefilled some of the values based on the current connection.", null);
+                                }));
+
                                 foreach (TreeNode argNode in createNode.Nodes)
                                 {
                                     if (argNode.Tag != null && connection != null)
@@ -441,15 +435,15 @@ namespace MikeFactorial.XTB.PPCLIx
                                         {
                                             ((PacTag)argNode.Tag).Value = connection.ConnectionName;
                                         }
-                                        else if (((PacTag)argNode.Tag).Name == "--username")
-                                        {
-                                            ((PacTag)argNode.Tag).Value = connection.UserName;
-                                        }
                                         else if (((PacTag)argNode.Tag).Name == "--environment")
                                         {
                                             ((PacTag)argNode.Tag).Value = connection.WebApplicationUrl;
                                         }
                                         /*
+                                        else if (((PacTag)argNode.Tag).Name == "--username")
+                                        {
+                                            ((PacTag)argNode.Tag).Value = connection.UserName;
+                                        }
                                         else if (((PacTag)argNode.Tag).Name == "--applicationId")
                                         {
                                             ((PacTag)argNode.Tag).Value = connection.AzureAdAppId;
@@ -457,15 +451,14 @@ namespace MikeFactorial.XTB.PPCLIx
                                         */
                                     }
                                 }
+                                this.Invoke(new MethodInvoker(delegate
+                                {
+                                    UpdateCommandText();
+                                }));
+
                             }
                         }
-                        ShowInfoNotification("No existing authentication profile could be found for the current connection. Use pac auth create to create a new authentication prfoile. We've prefilled some of the values based on the current connection.", null);
                     }
-                    else
-                    {
-                        LoadPacAuthorizationProfiles();
-                    }
-
                 },
                 PostWorkCallBack = (args) =>
                 {
@@ -547,7 +540,7 @@ namespace MikeFactorial.XTB.PPCLIx
                 WorkAsync(new WorkAsyncInfo
                 {
                     IsCancelable = true,
-                    Message = $"Installing Power Platform Commands...",
+                    Message = $"Installing Power Platform CLI ({selectedVersion})...",
                     Work = (worker, args) =>
                     {
                         this.InstallSelectedPacVersion(selectedVersion);
@@ -571,7 +564,7 @@ namespace MikeFactorial.XTB.PPCLIx
                     {
                         if (args.Error != null)
                         {
-                            ShowErrorNotification("An error ocurred when trying to set the command line authorization. Try running 'Sync CLI Auth with Current Connection' or run 'pac auth select' from the command line to run commands against your environment.", null);
+                            ShowErrorNotification("An error ocurred when trying to install the specified version. Try running 'Sync CLI Auth with Current Connection' or run 'pac auth select' from the command line to run commands against your environment.", null);
                             return;
                         }
                         this.treePacCommands.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.TreePacCommands_BeforeExpand);
@@ -718,7 +711,7 @@ namespace MikeFactorial.XTB.PPCLIx
         /// <param name="e">Event Arguments</param>
         private void propertyGrid1_SelectedGridItemChanged(object sender, SelectedGridItemChangedEventArgs e)
         {
-            propertyGrid1.DocCommentHeight = 300;
+            propertyGrid1.DocCommentHeight = 200;
         }
         /// <summary>
         /// Runs the command in the command text box
@@ -751,20 +744,41 @@ namespace MikeFactorial.XTB.PPCLIx
         /// <param name="e">Event Arguments</param>
         private void syncCLIAuthWithCurrentConnectionToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            foreach (var item in toolStripConnectionDropDown.DropDownItems)
+            {
+                var menuItem = item as ToolStripMenuItem;
+                if (menuItem != null && menuItem.Name != ((ToolStripMenuItem)sender).Name)
+                {
+                    menuItem.Checked = false;
+                }
+            }
+
             if (((ToolStripMenuItem)sender).Name == syncCLIAuthWithCurrentConnectionToolStripMenuItem.Name)
             {
                 SyncPacAuthWithConnectionWorker(ConnectionDetail);
             }
+            else if (((ToolStripMenuItem)sender).Name == refreshCLIAuthToolStripMenuItem.Name)
+            {
+                WorkAsync(new WorkAsyncInfo
+                {
+                    IsCancelable = true,
+                    Message = $"Refreshing Power Platform Authorization Profiles...",
+                    Work = (worker, args) =>
+                    {
+                        LoadPacAuthorizationProfiles();
+                    },
+                    PostWorkCallBack = (args) =>
+                    {
+                        if (args.Error != null)
+                        {
+                            ShowErrorNotification("An error occurred when trying to load the Power Platform authorization profiles. Try running 'Sync CLI Auth with Current Connection' or run 'pac auth select' from the command line to run commands against your environment.", null);
+                            return;
+                        }
+                    }
+                });
+            }
             else
             {
-                foreach (var item in toolStripConnectionDropDown.DropDownItems)
-                {
-                    var menuItem = item as ToolStripMenuItem;
-                    if (menuItem != null && menuItem.Name != ((ToolStripMenuItem)sender).Name)
-                    {
-                        menuItem.Checked = false;
-                    }
-                }
                 SyncPacAuthWithSelectedWorker(((ToolStripMenuItem)sender).Name, $"The authentication profile updated to use for future commands. NOTE: Your command line connection may no longer be in sync with the XrmToolBox connection.");
             }
         }

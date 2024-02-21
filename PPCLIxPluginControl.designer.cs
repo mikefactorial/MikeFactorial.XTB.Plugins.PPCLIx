@@ -52,6 +52,7 @@ namespace MikeFactorial.XTB.PPCLIx
             this.textBoxParentNodeHelp = new System.Windows.Forms.TextBox();
             this.groupBoxOutput = new System.Windows.Forms.GroupBox();
             this.textBoxOutput = new System.Windows.Forms.TextBox();
+            this.refreshCLIAuthToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenu.SuspendLayout();
             this.groupCommandArgs.SuspendLayout();
             this.groupTree.SuspendLayout();
@@ -97,6 +98,7 @@ namespace MikeFactorial.XTB.PPCLIx
             // 
             this.toolStripConnectionDropDown.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.toolStripConnectionDropDown.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.refreshCLIAuthToolStripMenuItem,
             this.syncCLIAuthWithCurrentConnectionToolStripMenuItem,
             this.toolStripSeparator3});
             this.toolStripConnectionDropDown.Image = ((System.Drawing.Image)(resources.GetObject("toolStripConnectionDropDown.Image")));
@@ -143,9 +145,9 @@ namespace MikeFactorial.XTB.PPCLIx
             this.groupCommandArgs.Controls.Add(this.propertyGrid1);
             this.groupCommandArgs.Dock = System.Windows.Forms.DockStyle.Right;
             this.groupCommandArgs.Location = new System.Drawing.Point(892, 31);
-            this.groupCommandArgs.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupCommandArgs.Margin = new System.Windows.Forms.Padding(4);
             this.groupCommandArgs.Name = "groupCommandArgs";
-            this.groupCommandArgs.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupCommandArgs.Padding = new System.Windows.Forms.Padding(4);
             this.groupCommandArgs.Size = new System.Drawing.Size(427, 595);
             this.groupCommandArgs.TabIndex = 14;
             this.groupCommandArgs.TabStop = false;
@@ -156,7 +158,7 @@ namespace MikeFactorial.XTB.PPCLIx
             this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.propertyGrid1.LineColor = System.Drawing.SystemColors.ScrollBar;
             this.propertyGrid1.Location = new System.Drawing.Point(4, 19);
-            this.propertyGrid1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.propertyGrid1.Margin = new System.Windows.Forms.Padding(4);
             this.propertyGrid1.Name = "propertyGrid1";
             this.propertyGrid1.Size = new System.Drawing.Size(419, 572);
             this.propertyGrid1.TabIndex = 18;
@@ -168,9 +170,9 @@ namespace MikeFactorial.XTB.PPCLIx
             this.groupTree.Controls.Add(this.treePacCommands);
             this.groupTree.Dock = System.Windows.Forms.DockStyle.Left;
             this.groupTree.Location = new System.Drawing.Point(0, 31);
-            this.groupTree.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupTree.Margin = new System.Windows.Forms.Padding(4);
             this.groupTree.Name = "groupTree";
-            this.groupTree.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupTree.Padding = new System.Windows.Forms.Padding(4);
             this.groupTree.Size = new System.Drawing.Size(427, 595);
             this.groupTree.TabIndex = 15;
             this.groupTree.TabStop = false;
@@ -181,7 +183,7 @@ namespace MikeFactorial.XTB.PPCLIx
             this.treePacCommands.FullRowSelect = true;
             this.treePacCommands.HideSelection = false;
             this.treePacCommands.Location = new System.Drawing.Point(4, 19);
-            this.treePacCommands.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.treePacCommands.Margin = new System.Windows.Forms.Padding(4);
             this.treePacCommands.Name = "treePacCommands";
             this.treePacCommands.PathSeparator = " ";
             this.treePacCommands.Size = new System.Drawing.Size(419, 572);
@@ -192,9 +194,9 @@ namespace MikeFactorial.XTB.PPCLIx
             this.groupCommandArea.Controls.Add(this.textBoxCommandText);
             this.groupCommandArea.Dock = System.Windows.Forms.DockStyle.Top;
             this.groupCommandArea.Location = new System.Drawing.Point(427, 31);
-            this.groupCommandArea.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupCommandArea.Margin = new System.Windows.Forms.Padding(4);
             this.groupCommandArea.Name = "groupCommandArea";
-            this.groupCommandArea.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupCommandArea.Padding = new System.Windows.Forms.Padding(4);
             this.groupCommandArea.Size = new System.Drawing.Size(465, 54);
             this.groupCommandArea.TabIndex = 16;
             this.groupCommandArea.TabStop = false;
@@ -205,7 +207,7 @@ namespace MikeFactorial.XTB.PPCLIx
             this.textBoxCommandText.Dock = System.Windows.Forms.DockStyle.Top;
             this.textBoxCommandText.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBoxCommandText.Location = new System.Drawing.Point(4, 19);
-            this.textBoxCommandText.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.textBoxCommandText.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxCommandText.Name = "textBoxCommandText";
             this.textBoxCommandText.Size = new System.Drawing.Size(457, 20);
             this.textBoxCommandText.TabIndex = 25;
@@ -216,9 +218,9 @@ namespace MikeFactorial.XTB.PPCLIx
             this.groupBoxHelp.Controls.Add(this.textBoxParentNodeHelp);
             this.groupBoxHelp.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.groupBoxHelp.Location = new System.Drawing.Point(427, 280);
-            this.groupBoxHelp.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBoxHelp.Margin = new System.Windows.Forms.Padding(4);
             this.groupBoxHelp.Name = "groupBoxHelp";
-            this.groupBoxHelp.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBoxHelp.Padding = new System.Windows.Forms.Padding(4);
             this.groupBoxHelp.Size = new System.Drawing.Size(465, 346);
             this.groupBoxHelp.TabIndex = 17;
             this.groupBoxHelp.TabStop = false;
@@ -228,7 +230,7 @@ namespace MikeFactorial.XTB.PPCLIx
             // 
             this.textBoxParentNodeHelp.Dock = System.Windows.Forms.DockStyle.Fill;
             this.textBoxParentNodeHelp.Location = new System.Drawing.Point(4, 19);
-            this.textBoxParentNodeHelp.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.textBoxParentNodeHelp.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxParentNodeHelp.Multiline = true;
             this.textBoxParentNodeHelp.Name = "textBoxParentNodeHelp";
             this.textBoxParentNodeHelp.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
@@ -240,9 +242,9 @@ namespace MikeFactorial.XTB.PPCLIx
             this.groupBoxOutput.Controls.Add(this.textBoxOutput);
             this.groupBoxOutput.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBoxOutput.Location = new System.Drawing.Point(427, 85);
-            this.groupBoxOutput.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBoxOutput.Margin = new System.Windows.Forms.Padding(4);
             this.groupBoxOutput.Name = "groupBoxOutput";
-            this.groupBoxOutput.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBoxOutput.Padding = new System.Windows.Forms.Padding(4);
             this.groupBoxOutput.Size = new System.Drawing.Size(465, 195);
             this.groupBoxOutput.TabIndex = 18;
             this.groupBoxOutput.TabStop = false;
@@ -252,12 +254,19 @@ namespace MikeFactorial.XTB.PPCLIx
             // 
             this.textBoxOutput.Dock = System.Windows.Forms.DockStyle.Fill;
             this.textBoxOutput.Location = new System.Drawing.Point(4, 19);
-            this.textBoxOutput.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.textBoxOutput.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxOutput.Multiline = true;
             this.textBoxOutput.Name = "textBoxOutput";
             this.textBoxOutput.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textBoxOutput.Size = new System.Drawing.Size(457, 172);
             this.textBoxOutput.TabIndex = 25;
+            // 
+            // refreshCLIAuthToolStripMenuItem
+            // 
+            this.refreshCLIAuthToolStripMenuItem.Name = "refreshCLIAuthToolStripMenuItem";
+            this.refreshCLIAuthToolStripMenuItem.Size = new System.Drawing.Size(282, 22);
+            this.refreshCLIAuthToolStripMenuItem.Text = "Refresh CLI Auth Profiles";
+            this.refreshCLIAuthToolStripMenuItem.Click += new System.EventHandler(this.syncCLIAuthWithCurrentConnectionToolStripMenuItem_Click);
             // 
             // PPCLIxPluginControl
             // 
@@ -269,7 +278,7 @@ namespace MikeFactorial.XTB.PPCLIx
             this.Controls.Add(this.groupTree);
             this.Controls.Add(this.groupCommandArgs);
             this.Controls.Add(this.toolStripMenu);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "PPCLIxPluginControl";
             this.PluginIcon = ((System.Drawing.Icon)(resources.GetObject("$this.PluginIcon")));
             this.Size = new System.Drawing.Size(1319, 626);
@@ -312,5 +321,6 @@ namespace MikeFactorial.XTB.PPCLIx
         private ToolStripDropDownButton toolStripConnectionDropDown;
         private ToolStripMenuItem syncCLIAuthWithCurrentConnectionToolStripMenuItem;
         private ToolStripSeparator toolStripSeparator3;
+        private ToolStripMenuItem refreshCLIAuthToolStripMenuItem;
     }
 }

@@ -245,6 +245,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Images\PlugRefresh.png" />
     <Content Include="Images\PPCLIxImage.jpg" />
     <Content Include="Images\PPCLIxImage32x32.jpg" />
     <Content Include="Images\PPCLIxImage80x80.jpg" />
