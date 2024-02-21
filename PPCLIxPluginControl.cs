@@ -1,24 +1,15 @@
 ﻿using McTools.Xrm.Connection;
 using Microsoft.Xrm.Sdk;
-using NuGet.Common;
-using NuGet.Packaging.Core;
-using NuGet.Packaging;
-using NuGet.Protocol;
-using NuGet.Protocol.Core.Types;
-using NuGet.Versioning;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
-using System.Threading;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using XrmToolBox.Extensibility;
-using System.Reflection;
 using XrmToolBox.Extensibility.Interfaces;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
-using NuGet.Protocol.Plugins;
-using System.Xml.Linq;
 
 namespace MikeFactorial.XTB.PPCLIx
 {
@@ -81,10 +72,10 @@ namespace MikeFactorial.XTB.PPCLIx
         public void UpdatePacVersions()
         {
             toolStripCLIVersionsDropDown.Items.Clear();
-            toolStripCLIVersionsDropDown.Items.AddRange(NugetFeed.Versions.Reverse().ToArray());
+            toolStripCLIVersionsDropDown.Items.AddRange(NugetFeed.Versions.ToArray());
             if (toolStripCLIVersionsDropDown.SelectedItem == null)
             {
-                toolStripCLIVersionsDropDown.SelectedItem = NugetFeed.Versions.LastOrDefault();
+                toolStripCLIVersionsDropDown.SelectedItem = NugetFeed.Versions.FirstOrDefault();
             }
         }
         /// <summary>
@@ -98,42 +89,43 @@ namespace MikeFactorial.XTB.PPCLIx
             if (!string.IsNullOrEmpty(PacExecutable))
             {
                 //Create process
-                System.Diagnostics.Process pProcess = new System.Diagnostics.Process();
-                //strCommand is path and file name of command to run
-                pProcess.StartInfo.FileName = PacExecutable;
-                pProcess.StartInfo.UseShellExecute = false;
-                pProcess.StartInfo.CreateNoWindow = true;
-                //Set output of program to be written to process output stream
-                pProcess.StartInfo.RedirectStandardOutput = true;
-                //Optional
-                pProcess.StartInfo.WorkingDirectory = pacPath;
-                if (streamOutputToLabel)
+                using (System.Diagnostics.Process pProcess = new System.Diagnostics.Process())
                 {
-                    textBoxOutput.Text = $"Executing command '{command}'";
-                    pProcess.ErrorDataReceived += Process_OutputDataReceived;
-                    pProcess.OutputDataReceived += Process_OutputDataReceived;
-                    //strCommandParameters are parameters to pass to program
-                    pProcess.StartInfo.Arguments = command;
-                    pProcess.Start();
-                    pProcess.BeginOutputReadLine();
-                }
+                    //strCommand is path and file name of command to run
+                    pProcess.StartInfo.FileName = PacExecutable;
+                    pProcess.StartInfo.UseShellExecute = false;
+                    pProcess.StartInfo.CreateNoWindow = true;
+                    //Set output of program to be written to process output stream
+                    pProcess.StartInfo.RedirectStandardOutput = true;
+                    //Optional
+                    pProcess.StartInfo.WorkingDirectory = pacPath;
+                    if (streamOutputToLabel)
+                    {
+                        textBoxOutput.Text = $"Executing command '{command}'";
+                        pProcess.ErrorDataReceived += Process_OutputDataReceived;
+                        pProcess.OutputDataReceived += Process_OutputDataReceived;
+                        //strCommandParameters are parameters to pass to program
+                        pProcess.StartInfo.Arguments = command;
+                        pProcess.Start();
+                        pProcess.BeginOutputReadLine();
+                    }
 
-                if (streamOutputToLabel)
-                {
-                    return string.Empty;
-                }
-                else
-                {
-                    //strCommandParameters are parameters to pass to program
-                    pProcess.StartInfo.Arguments = command;
-                    //Start the process
-                    pProcess.Start();
-                    //Get program output
-                    string strOutput = pProcess.StandardOutput.ReadToEnd();
-                    //Wait for process to finish
-                    pProcess.WaitForExit();
-                    pProcess = null;
-                    return strOutput;
+                    if (streamOutputToLabel)
+                    {
+                        return string.Empty;
+                    }
+                    else
+                    {
+                        //strCommandParameters are parameters to pass to program
+                        pProcess.StartInfo.Arguments = command;
+                        //Start the process
+                        pProcess.Start();
+                        //Get program output
+                        string strOutput = pProcess.StandardOutput.ReadToEnd();
+                        //Wait for process to finish
+                        pProcess.WaitForExit();
+                        return strOutput;
+                    }
                 }
             }
             return string.Empty;
@@ -267,41 +259,24 @@ namespace MikeFactorial.XTB.PPCLIx
             }
             this.propertyGrid1.SelectedObject = new PacTagListPropertyGridAdapter(tags);
         }
+
         /// <summary>
         /// Installs the pac version selected from the menu if it hasn't already been installed
         /// </summary>
-        public async Task InstallSelectedPacVersion(NuGetVersion selectedVersion)
+        public async Task InstallSelectedPacVersion(string selectedVersion)
         {
             using (var packageStream = new MemoryStream())
             {
-                await NugetFeed.Resource.CopyNupkgToStreamAsync(
-                    NugetFeed.PackageId,
-                    selectedVersion,
-                    packageStream,
-                    NugetFeed.Cache,
-                    NugetFeed.Logger,
-                    NugetFeed.CancellationToken);
-
-                packageStream.Position = 0; // Reset stream position
-
-                // Define the package and the folder to unpack to
-                PackageIdentity identity = new PackageIdentity(NugetFeed.PackageId, selectedVersion);
-                string currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                PackagePathResolver pathResolver = new PackagePathResolver(currentDirectory);
-
-                var packageExtractionContext = new PackageExtractionContext(
-                    PackageSaveMode.Defaultv3,
-                    XmlDocFileSaveMode.None,
-                    null,
-                    NullLogger.Instance);
-
-                // Unpack the package
-                await PackageExtractor.ExtractPackageAsync(
-                    NugetFeed.Repository.PackageSource.Source,
-                    packageStream,
-                    pathResolver,
-                    packageExtractionContext,
-                    NugetFeed.CancellationToken);
+                string currentDirectory = Path.GetDirectoryName(this.GetType().Assembly.Location);
+                var outputDirectory = $"{NugetFeed.PackageId}.{selectedVersion}";
+                if (!Directory.Exists(Path.Combine(currentDirectory, outputDirectory)))
+                {
+                    using (var stream = await NugetFeed.DownloadPackageStreamAsync(selectedVersion))
+                    {
+                        var archive = new ZipArchive(stream);
+                        archive.ExtractToDirectory(Path.Combine(currentDirectory, outputDirectory));
+                    }
+                }
             }
         }
         /// <summary>
@@ -484,11 +459,11 @@ namespace MikeFactorial.XTB.PPCLIx
         /// </summary>
         public virtual async Task InstallSelectedPacVersionWorker(bool syncConnection)
         {
-            NuGetVersion selectedVersion = NugetFeed.Versions.LastOrDefault();
+            string selectedVersion = NugetFeed.Versions.FirstOrDefault();
 
             if (toolStripCLIVersionsDropDown.SelectedItem != null)
             {
-                selectedVersion = (NuGetVersion)toolStripCLIVersionsDropDown.SelectedItem;
+                selectedVersion = toolStripCLIVersionsDropDown.SelectedItem.ToString();
             }
             if (selectedVersion != null)
             {
@@ -501,7 +476,7 @@ namespace MikeFactorial.XTB.PPCLIx
                 this.mainNode = new TreeNode("pac");
                 this.treePacCommands.Nodes.Clear();
                 this.treePacCommands.Nodes.Add(mainNode);
-                this.pacPath = $"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\\Microsoft.PowerApps.CLI.{((NuGetVersion)toolStripCLIVersionsDropDown.SelectedItem).OriginalVersion.ToString()}";
+                this.pacPath = $"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\\Microsoft.PowerApps.CLI.{toolStripCLIVersionsDropDown.SelectedItem.ToString()}";
 
                 this.Enabled = false;
                 try
@@ -531,7 +506,7 @@ namespace MikeFactorial.XTB.PPCLIx
                         }
                         else
                         {
-                            this.NugetFeed.NugetVersionLoaded = ((NuGetVersion)toolStripCLIVersionsDropDown.SelectedItem).OriginalVersion;
+                            this.NugetFeed.NugetVersionLoaded = toolStripCLIVersionsDropDown.SelectedItem.ToString();
                             mainNode.Tag = new PacTag(ref mainNode)
                             {
                                 Type = PacTag.PacTagType.Root,
@@ -601,7 +576,7 @@ namespace MikeFactorial.XTB.PPCLIx
             }
             catch (Exception ex)
             {
-                ShowErrorNotification($"An unexpected error occurred while loading the tool. Please try again or file an issue with the details of the error and the command you're trying to run.\n{ex.ToString()}", new Uri("https://github.com/mikefactorial/MikeFactorial.XTB.Plugins.PACUI/issues"), 32);
+                ShowErrorNotification($"An unexpected error occurred while loading the tool. Please try again or file an issue with the details of the error and the command you're trying to run.\n{ex.ToString()}", new Uri("https://github.com/mikefactorial/MikeFactorial.XTB.Plugins.PACUI/issues"), 64);
             }
             finally
             {
@@ -630,14 +605,14 @@ namespace MikeFactorial.XTB.PPCLIx
         {
             try
             { 
-                if (NugetFeed.NugetVersionLoaded != ((NuGetVersion)toolStripCLIVersionsDropDown.SelectedItem).OriginalVersion.ToString())
+                if (NugetFeed.NugetVersionLoaded != toolStripCLIVersionsDropDown.SelectedItem.ToString())
                 {
                     await this.InstallSelectedPacVersionWorker(false);
                 }
             }
             catch (Exception ex)
             {
-                ShowErrorNotification($"An error occurred while loading the selected CLI version. Please try again or file an issue with the details of the error and the command you're trying to run.\n{ex.ToString()}", new Uri("https://github.com/mikefactorial/MikeFactorial.XTB.Plugins.PACUI/issues"), 32);
+                ShowErrorNotification($"An error occurred while loading the selected CLI version. Please try again or file an issue with the details of the error and the command you're trying to run.\n{ex.ToString()}", new Uri("https://github.com/mikefactorial/MikeFactorial.XTB.Plugins.PACUI/issues"), 64);
             }
         }
         /// <summary>
@@ -672,7 +647,7 @@ namespace MikeFactorial.XTB.PPCLIx
             }
             catch (Exception ex)
             {
-                ShowErrorNotification($"An error occurred while loading the commands. Please try again or file an issue with the details of the error and the command you're trying to run.\n{ex.ToString()}", new Uri("https://github.com/mikefactorial/MikeFactorial.XTB.Plugins.PACUI/issues"), 32);
+                ShowErrorNotification($"An error occurred while loading the commands. Please try again or file an issue with the details of the error and the command you're trying to run.\n{ex.ToString()}", new Uri("https://github.com/mikefactorial/MikeFactorial.XTB.Plugins.PACUI/issues"), 64);
             }
         }
 
@@ -696,7 +671,7 @@ namespace MikeFactorial.XTB.PPCLIx
             }
             catch (Exception ex)
             {
-                ShowErrorNotification($"An error occurred while loading the commands. Please try again or file an issue with the details of the error and the command you're trying to run.\n{ex.ToString()}", new Uri("https://github.com/mikefactorial/MikeFactorial.XTB.Plugins.PACUI/issues"), 32);
+                ShowErrorNotification($"An error occurred while loading the commands. Please try again or file an issue with the details of the error and the command you're trying to run.\n{ex.ToString()}", new Uri("https://github.com/mikefactorial/MikeFactorial.XTB.Plugins.PACUI/issues"), 64);
             }
         }
         /// <summary>
@@ -734,7 +709,7 @@ namespace MikeFactorial.XTB.PPCLIx
             }
             catch (Exception ex)
             {
-                ShowErrorNotification($"An error occurred while running the command. Please try again or file an issue with the details of the error and the command you're trying to run.\n{ex.ToString()}", new Uri("https://github.com/mikefactorial/MikeFactorial.XTB.Plugins.PACUI/issues"), 32);
+                ShowErrorNotification($"An error occurred while running the command. Please try again or file an issue with the details of the error and the command you're trying to run.\n{ex.ToString()}", new Uri("https://github.com/mikefactorial/MikeFactorial.XTB.Plugins.PACUI/issues"), 64);
             }
             finally
             {

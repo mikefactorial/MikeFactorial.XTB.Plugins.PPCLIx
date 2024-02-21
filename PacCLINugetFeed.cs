@@ -1,53 +1,69 @@
 ﻿using Microsoft.Crm.Sdk.Messages;
-using NuGet.Common;
-using NuGet.Protocol;
-using NuGet.Protocol.Core.Types;
-using NuGet.Versioning;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web.Caching;
+using System.Web.Configuration;
+using System.Web.Hosting;
 
 namespace MikeFactorial.XTB.PPCLIx
 {
     public class PacCLINugetFeed
     {
-        private SourceCacheContext cache = new SourceCacheContext();
-        private SourceRepository repository = NuGet.Protocol.Core.Types.Repository.Factory.GetCoreV3("https://api.nuget.org/v3/index.json");
-
-        public NuGet.Common.ILogger Logger => NullLogger.Instance;
-
-        public CancellationToken CancellationToken => CancellationToken.None;
+        private HttpClient client = new HttpClient();
 
         public string PackageId => "Microsoft.PowerApps.CLI";
 
-        public async virtual Task Initialize()
-        {
-            this.Resource = await Repository.GetResourceAsync<FindPackageByIdResource>();
-            this.Versions = await Resource.GetAllVersionsAsync(PackageId, Cache, Logger, CancellationToken);
-        }
-        public virtual SourceCacheContext Cache
+        public HttpClient Client
         {
             get
             {
-                return cache;
+                return client;
+            }
+            set
+            {
+                client = value;
             }
         }
-        public virtual SourceRepository Repository
+        public async virtual Task<Stream> DownloadPackageStreamAsync(string version)
         {
-            get
-            {
-                return repository;
-            }
+            return await Client.GetStreamAsync($"https://www.nuget.org/api/v2/package/{PackageId}/{version}");
         }
 
-        public virtual FindPackageByIdResource Resource
+        public async virtual Task<Stream> DownloadPackageInfoStreamAsync()
         {
-            get; set;
+            return await Client.GetStreamAsync($"https://api.nuget.org/v3/registration5-semver1/{PackageId.ToLower()}/index.json");
         }
-        public virtual IEnumerable<NuGetVersion> Versions
+        public async virtual Task Initialize()
+        {
+            using (var stream = await DownloadPackageInfoStreamAsync())
+            {
+                using (StreamReader reader = new StreamReader(stream, Encoding.UTF8))
+                {
+                    var json = reader.ReadToEnd();
+                    NuGetPackageInfo packageInfo = JsonConvert.DeserializeObject<NuGetPackageInfo>(json);
+
+                    this.Versions = new List<string>();
+                    foreach (var item in packageInfo.items)
+                    {
+                        foreach (var item2 in item.items)
+                        {
+                            this.Versions.Add(item2.catalogEntry.version);
+                        }
+                    }
+                }
+            }
+            Versions.Reverse();
+        }
+
+        public virtual List<string> Versions
         { 
             get; set; 
         }
