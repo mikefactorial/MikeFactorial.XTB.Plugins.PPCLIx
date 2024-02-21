@@ -35,13 +35,14 @@ namespace MikeFactorial.XTB.PPCLIx
             this.toolStripPacVersionLabel = new System.Windows.Forms.ToolStripLabel();
             this.toolStripCLIVersionsDropDown = new System.Windows.Forms.ToolStripComboBox();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
+            this.toolStripConnectionDropDown = new System.Windows.Forms.ToolStripDropDownButton();
             this.syncCLIAuthWithCurrentConnectionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripSeparator = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripRunButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.groupCommandArgs = new System.Windows.Forms.GroupBox();
+            this.propertyGrid1 = new MikeFactorial.XTB.PPCLIx.PropertyGridEx();
             this.groupTree = new System.Windows.Forms.GroupBox();
             this.treePacCommands = new System.Windows.Forms.TreeView();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
@@ -51,7 +52,6 @@ namespace MikeFactorial.XTB.PPCLIx
             this.textBoxParentNodeHelp = new System.Windows.Forms.TextBox();
             this.groupBoxOutput = new System.Windows.Forms.GroupBox();
             this.textBoxOutput = new System.Windows.Forms.TextBox();
-            this.propertyGrid1 = new MikeFactorial.XTB.PPCLIx.PropertyGridEx();
             this.toolStripMenu.SuspendLayout();
             this.groupCommandArgs.SuspendLayout();
             this.groupTree.SuspendLayout();
@@ -67,13 +67,13 @@ namespace MikeFactorial.XTB.PPCLIx
             this.toolStripPacVersionLabel,
             this.toolStripCLIVersionsDropDown,
             this.toolStripSeparator1,
-            this.toolStripDropDownButton1,
+            this.toolStripConnectionDropDown,
             this.toolStripSeparator,
             this.toolStripRunButton,
             this.toolStripSeparator2});
             this.toolStripMenu.Location = new System.Drawing.Point(0, 0);
             this.toolStripMenu.Name = "toolStripMenu";
-            this.toolStripMenu.Size = new System.Drawing.Size(989, 31);
+            this.toolStripMenu.Size = new System.Drawing.Size(1319, 31);
             this.toolStripMenu.TabIndex = 4;
             this.toolStripMenu.Text = "toolStrip1";
             // 
@@ -86,25 +86,24 @@ namespace MikeFactorial.XTB.PPCLIx
             // toolStripCLIVersionsDropDown
             // 
             this.toolStripCLIVersionsDropDown.Name = "toolStripCLIVersionsDropDown";
-            this.toolStripCLIVersionsDropDown.Size = new System.Drawing.Size(121, 31);
-            this.toolStripCLIVersionsDropDown.SelectedIndexChanged += new System.EventHandler(this.ToolStripCLIVersionsDropDown_SelectedIndexChanged);
+            this.toolStripCLIVersionsDropDown.Size = new System.Drawing.Size(160, 31);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
             this.toolStripSeparator1.Size = new System.Drawing.Size(6, 31);
             // 
-            // toolStripDropDownButton1
+            // toolStripConnectionDropDown
             // 
-            this.toolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripConnectionDropDown.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripConnectionDropDown.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.syncCLIAuthWithCurrentConnectionToolStripMenuItem,
             this.toolStripSeparator3});
-            this.toolStripDropDownButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton1.Image")));
-            this.toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
-            this.toolStripDropDownButton1.Size = new System.Drawing.Size(37, 28);
-            this.toolStripDropDownButton1.Text = "Update CLI Connection";
+            this.toolStripConnectionDropDown.Image = ((System.Drawing.Image)(resources.GetObject("toolStripConnectionDropDown.Image")));
+            this.toolStripConnectionDropDown.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripConnectionDropDown.Name = "toolStripConnectionDropDown";
+            this.toolStripConnectionDropDown.Size = new System.Drawing.Size(37, 28);
+            this.toolStripConnectionDropDown.Text = "Update CLI Connection";
             // 
             // syncCLIAuthWithCurrentConnectionToolStripMenuItem
             // 
@@ -143,19 +142,36 @@ namespace MikeFactorial.XTB.PPCLIx
             // 
             this.groupCommandArgs.Controls.Add(this.propertyGrid1);
             this.groupCommandArgs.Dock = System.Windows.Forms.DockStyle.Right;
-            this.groupCommandArgs.Location = new System.Drawing.Point(669, 31);
+            this.groupCommandArgs.Location = new System.Drawing.Point(892, 31);
+            this.groupCommandArgs.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.groupCommandArgs.Name = "groupCommandArgs";
-            this.groupCommandArgs.Size = new System.Drawing.Size(320, 478);
+            this.groupCommandArgs.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupCommandArgs.Size = new System.Drawing.Size(427, 595);
             this.groupCommandArgs.TabIndex = 14;
             this.groupCommandArgs.TabStop = false;
+            // 
+            // propertyGrid1
+            // 
+            this.propertyGrid1.DocCommentHeight = 59;
+            this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.propertyGrid1.LineColor = System.Drawing.SystemColors.ScrollBar;
+            this.propertyGrid1.Location = new System.Drawing.Point(4, 19);
+            this.propertyGrid1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.propertyGrid1.Name = "propertyGrid1";
+            this.propertyGrid1.Size = new System.Drawing.Size(419, 572);
+            this.propertyGrid1.TabIndex = 18;
+            this.propertyGrid1.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid1_PropertyValueChanged);
+            this.propertyGrid1.SelectedGridItemChanged += new System.Windows.Forms.SelectedGridItemChangedEventHandler(this.propertyGrid1_SelectedGridItemChanged);
             // 
             // groupTree
             // 
             this.groupTree.Controls.Add(this.treePacCommands);
             this.groupTree.Dock = System.Windows.Forms.DockStyle.Left;
             this.groupTree.Location = new System.Drawing.Point(0, 31);
+            this.groupTree.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.groupTree.Name = "groupTree";
-            this.groupTree.Size = new System.Drawing.Size(320, 478);
+            this.groupTree.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupTree.Size = new System.Drawing.Size(427, 595);
             this.groupTree.TabIndex = 15;
             this.groupTree.TabStop = false;
             // 
@@ -164,21 +180,22 @@ namespace MikeFactorial.XTB.PPCLIx
             this.treePacCommands.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treePacCommands.FullRowSelect = true;
             this.treePacCommands.HideSelection = false;
-            this.treePacCommands.Location = new System.Drawing.Point(3, 16);
+            this.treePacCommands.Location = new System.Drawing.Point(4, 19);
+            this.treePacCommands.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.treePacCommands.Name = "treePacCommands";
             this.treePacCommands.PathSeparator = " ";
-            this.treePacCommands.Size = new System.Drawing.Size(314, 459);
+            this.treePacCommands.Size = new System.Drawing.Size(419, 572);
             this.treePacCommands.TabIndex = 7;
-            this.treePacCommands.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.TreePacCommands_BeforeExpand);
-            this.treePacCommands.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreePacCommands_AfterSelect);
             // 
             // groupCommandArea
             // 
             this.groupCommandArea.Controls.Add(this.textBoxCommandText);
             this.groupCommandArea.Dock = System.Windows.Forms.DockStyle.Top;
-            this.groupCommandArea.Location = new System.Drawing.Point(320, 31);
+            this.groupCommandArea.Location = new System.Drawing.Point(427, 31);
+            this.groupCommandArea.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.groupCommandArea.Name = "groupCommandArea";
-            this.groupCommandArea.Size = new System.Drawing.Size(349, 44);
+            this.groupCommandArea.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupCommandArea.Size = new System.Drawing.Size(465, 54);
             this.groupCommandArea.TabIndex = 16;
             this.groupCommandArea.TabStop = false;
             this.groupCommandArea.Text = "Command";
@@ -187,9 +204,10 @@ namespace MikeFactorial.XTB.PPCLIx
             // 
             this.textBoxCommandText.Dock = System.Windows.Forms.DockStyle.Top;
             this.textBoxCommandText.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxCommandText.Location = new System.Drawing.Point(3, 16);
+            this.textBoxCommandText.Location = new System.Drawing.Point(4, 19);
+            this.textBoxCommandText.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.textBoxCommandText.Name = "textBoxCommandText";
-            this.textBoxCommandText.Size = new System.Drawing.Size(343, 20);
+            this.textBoxCommandText.Size = new System.Drawing.Size(457, 20);
             this.textBoxCommandText.TabIndex = 25;
             this.textBoxCommandText.TextChanged += new System.EventHandler(this.textBoxCommandText_TextChanged);
             // 
@@ -197,9 +215,11 @@ namespace MikeFactorial.XTB.PPCLIx
             // 
             this.groupBoxHelp.Controls.Add(this.textBoxParentNodeHelp);
             this.groupBoxHelp.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.groupBoxHelp.Location = new System.Drawing.Point(320, 228);
+            this.groupBoxHelp.Location = new System.Drawing.Point(427, 280);
+            this.groupBoxHelp.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.groupBoxHelp.Name = "groupBoxHelp";
-            this.groupBoxHelp.Size = new System.Drawing.Size(349, 281);
+            this.groupBoxHelp.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBoxHelp.Size = new System.Drawing.Size(465, 346);
             this.groupBoxHelp.TabIndex = 17;
             this.groupBoxHelp.TabStop = false;
             this.groupBoxHelp.Text = "Help";
@@ -207,20 +227,23 @@ namespace MikeFactorial.XTB.PPCLIx
             // textBoxParentNodeHelp
             // 
             this.textBoxParentNodeHelp.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textBoxParentNodeHelp.Location = new System.Drawing.Point(3, 16);
+            this.textBoxParentNodeHelp.Location = new System.Drawing.Point(4, 19);
+            this.textBoxParentNodeHelp.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.textBoxParentNodeHelp.Multiline = true;
             this.textBoxParentNodeHelp.Name = "textBoxParentNodeHelp";
             this.textBoxParentNodeHelp.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBoxParentNodeHelp.Size = new System.Drawing.Size(343, 262);
+            this.textBoxParentNodeHelp.Size = new System.Drawing.Size(457, 323);
             this.textBoxParentNodeHelp.TabIndex = 24;
             // 
             // groupBoxOutput
             // 
             this.groupBoxOutput.Controls.Add(this.textBoxOutput);
             this.groupBoxOutput.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBoxOutput.Location = new System.Drawing.Point(320, 75);
+            this.groupBoxOutput.Location = new System.Drawing.Point(427, 85);
+            this.groupBoxOutput.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.groupBoxOutput.Name = "groupBoxOutput";
-            this.groupBoxOutput.Size = new System.Drawing.Size(349, 153);
+            this.groupBoxOutput.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBoxOutput.Size = new System.Drawing.Size(465, 195);
             this.groupBoxOutput.TabIndex = 18;
             this.groupBoxOutput.TabStop = false;
             this.groupBoxOutput.Text = "Output";
@@ -228,28 +251,17 @@ namespace MikeFactorial.XTB.PPCLIx
             // textBoxOutput
             // 
             this.textBoxOutput.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textBoxOutput.Location = new System.Drawing.Point(3, 16);
+            this.textBoxOutput.Location = new System.Drawing.Point(4, 19);
+            this.textBoxOutput.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.textBoxOutput.Multiline = true;
             this.textBoxOutput.Name = "textBoxOutput";
             this.textBoxOutput.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBoxOutput.Size = new System.Drawing.Size(343, 134);
+            this.textBoxOutput.Size = new System.Drawing.Size(457, 172);
             this.textBoxOutput.TabIndex = 25;
-            // 
-            // propertyGrid1
-            // 
-            this.propertyGrid1.DocCommentHeight = 59;
-            this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.propertyGrid1.LineColor = System.Drawing.SystemColors.ScrollBar;
-            this.propertyGrid1.Location = new System.Drawing.Point(3, 16);
-            this.propertyGrid1.Name = "propertyGrid1";
-            this.propertyGrid1.Size = new System.Drawing.Size(314, 459);
-            this.propertyGrid1.TabIndex = 18;
-            this.propertyGrid1.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid1_PropertyValueChanged);
-            this.propertyGrid1.SelectedGridItemChanged += new System.Windows.Forms.SelectedGridItemChangedEventHandler(this.propertyGrid1_SelectedGridItemChanged);
             // 
             // PPCLIxPluginControl
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.groupBoxOutput);
             this.Controls.Add(this.groupBoxHelp);
@@ -257,9 +269,10 @@ namespace MikeFactorial.XTB.PPCLIx
             this.Controls.Add(this.groupTree);
             this.Controls.Add(this.groupCommandArgs);
             this.Controls.Add(this.toolStripMenu);
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "PPCLIxPluginControl";
             this.PluginIcon = ((System.Drawing.Icon)(resources.GetObject("$this.PluginIcon")));
-            this.Size = new System.Drawing.Size(989, 509);
+            this.Size = new System.Drawing.Size(1319, 626);
             this.TabIcon = ((System.Drawing.Image)(resources.GetObject("$this.TabIcon")));
             this.Load += new System.EventHandler(this.MyPluginControl_Load);
             this.toolStripMenu.ResumeLayout(false);
@@ -296,7 +309,7 @@ namespace MikeFactorial.XTB.PPCLIx
         private TextBox textBoxOutput;
         private ToolStripSeparator toolStripSeparator;
         private ToolStripSeparator toolStripSeparator2;
-        private ToolStripDropDownButton toolStripDropDownButton1;
+        private ToolStripDropDownButton toolStripConnectionDropDown;
         private ToolStripMenuItem syncCLIAuthWithCurrentConnectionToolStripMenuItem;
         private ToolStripSeparator toolStripSeparator3;
     }

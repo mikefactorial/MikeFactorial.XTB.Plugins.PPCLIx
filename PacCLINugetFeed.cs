@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Web.Caching;
 using System.Web.Configuration;
 using System.Web.Hosting;
+using static WeifenLuo.WinFormsUI.Docking.VisualStudioToolStripExtender;
 
 namespace MikeFactorial.XTB.PPCLIx
 {
@@ -32,18 +33,22 @@ namespace MikeFactorial.XTB.PPCLIx
                 client = value;
             }
         }
-        public async virtual Task<Stream> DownloadPackageStreamAsync(string version)
+        public virtual Stream DownloadPackageStream(string version)
         {
-            return await Client.GetStreamAsync($"https://www.nuget.org/api/v2/package/{PackageId}/{version}");
+            var task = Task.Run(() => Client.GetStreamAsync($"https://www.nuget.org/api/v2/package/{PackageId}/{version}"));
+            task.Wait();
+            return task.Result;
         }
 
-        public async virtual Task<Stream> DownloadPackageInfoStreamAsync()
+        public virtual Stream DownloadPackageInfoStream()
         {
-            return await Client.GetStreamAsync($"https://api.nuget.org/v3/registration5-semver1/{PackageId.ToLower()}/index.json");
+            var task = Task.Run(() => Client.GetStreamAsync($"https://api.nuget.org/v3/registration5-semver1/{PackageId.ToLower()}/index.json"));
+            task.Wait();
+            return task.Result;
         }
-        public async virtual Task Initialize()
+        public virtual void Initialize()
         {
-            using (var stream = await DownloadPackageInfoStreamAsync())
+            using (var stream = DownloadPackageInfoStream())
             {
                 using (StreamReader reader = new StreamReader(stream, Encoding.UTF8))
                 {

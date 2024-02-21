@@ -179,8 +179,8 @@ namespace MikeFactorial.XTB.Plugins.PPCLIx.Tests
         {
             Form form = new Form();
             Mock<PacCLINugetFeed> nugetFeed = new Mock<PacCLINugetFeed>() { CallBase = true, };
-            nugetFeed.Setup(c => c.DownloadPackageInfoStreamAsync())
-                .ReturnsAsync(() =>
+            nugetFeed.Setup(c => c.DownloadPackageInfoStream())
+                .Returns(() =>
                 {
                     MemoryStream ms = new MemoryStream();
                     var sw = new StreamWriter(ms);
@@ -190,8 +190,8 @@ namespace MikeFactorial.XTB.Plugins.PPCLIx.Tests
                     return ms;
                 });
 
-            nugetFeed.Setup(c => c.DownloadPackageStreamAsync(It.IsAny<string>()))
-                .ReturnsAsync((string version) =>
+            nugetFeed.Setup(c => c.DownloadPackageStream(It.IsAny<string>()))
+                .Returns((string version) =>
                 {
                     using (FileStream file = new FileStream("../../Nuget/microsoft.powerapps.cli.1.30.7.nupkg", FileMode.Open, FileAccess.Read))
                     {
@@ -218,9 +218,9 @@ namespace MikeFactorial.XTB.Plugins.PPCLIx.Tests
 
         }
         [TestMethod]
-        public async Task LoadVersionsTest()
+        public void LoadVersionsTest()
         {
-            await control.NugetFeed.Initialize();
+            control.NugetFeed.Initialize();
 
             control.TreePacCommands.BeforeExpand -= control.TreePacCommands_BeforeExpand;
             control.TreePacCommands.AfterSelect -= control.TreePacCommands_AfterSelect;
@@ -238,9 +238,9 @@ namespace MikeFactorial.XTB.Plugins.PPCLIx.Tests
         }
 
         [TestMethod]
-        public async Task InstallSelectedPacVersionTest()
+        public void InstallSelectedPacVersionTest()
         {
-            await control.NugetFeed.Initialize();
+            control.NugetFeed.Initialize();
 
             control.TreePacCommands.BeforeExpand -= control.TreePacCommands_BeforeExpand;
             control.TreePacCommands.AfterSelect -= control.TreePacCommands_AfterSelect;
@@ -251,7 +251,7 @@ namespace MikeFactorial.XTB.Plugins.PPCLIx.Tests
                 Directory.Delete("./microsoft.powerapps.cli.1.30.7", true);
             }
             control.UpdatePacVersions();
-            await control.InstallSelectedPacVersion(control.NugetFeed.Versions.FirstOrDefault(v => v == "1.30.7"));
+            control.InstallSelectedPacVersion(control.NugetFeed.Versions.FirstOrDefault(v => v == "1.30.7"));
             Assert.IsTrue(Directory.Exists("./microsoft.powerapps.cli.1.30.7"));
 
             control.TreePacCommands.BeforeExpand += control.TreePacCommands_BeforeExpand;
