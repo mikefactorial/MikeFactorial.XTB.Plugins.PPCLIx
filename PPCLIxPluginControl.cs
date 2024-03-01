@@ -252,7 +252,7 @@ namespace MikeFactorial.XTB.PPCLIx
         {
             ((PacTag)node.Tag).HelpText = helpResults.Trim();
             node.Nodes.Clear();
-            foreach (var newNodeText in PacCommands.RetrieveUsageDetails(helpResults))
+            foreach (var newNodeText in PacCommands.RetrieveUsageDetails(helpResults, node.Text))
             {
                 var actionNode = new TreeNode(newNodeText);
                 var helpText = PacCommands.RetrieveNodeHelpText(helpResults, newNodeText);
@@ -295,7 +295,7 @@ namespace MikeFactorial.XTB.PPCLIx
                 Value = string.Empty
             };
             //Load the nouns
-            foreach (string noun in PacCommands.RetrieveUsageDetails(results))
+            foreach (string noun in PacCommands.RetrieveUsageDetails(results, "pac"))
             {
                 if (noun != "help")
                 {

@@ -20,13 +20,13 @@ namespace MikeFactorial.XTB.PPCLIx
             return -1;
         }
 
-        public static string[] RetrieveUsageDetails(string results)
+        public static string[] RetrieveUsageDetails(string results, string commandText)
         {
             if (results.Contains("[") && !results.Contains("Error:"))
             {
                 string usageDetails = results
                     .Split('\n')
-                    .FirstOrDefault(s => s.StartsWith("Usage:"));
+                    .FirstOrDefault(s => s.Contains($"{commandText} ["));
 
                 if (!string.IsNullOrEmpty(usageDetails))
                 {
@@ -48,7 +48,7 @@ namespace MikeFactorial.XTB.PPCLIx
             var lines = results.Split('\n');
             for (var i = 0; i < lines.Length; i++)
             {
-                if (lines[i].Trim().StartsWith(nodeText))
+                if (lines[i].Trim().StartsWith($"{nodeText} "))
                 {
                     if (lines.Length > i && lines[i + 1].Trim().StartsWith("Values"))
                     {
