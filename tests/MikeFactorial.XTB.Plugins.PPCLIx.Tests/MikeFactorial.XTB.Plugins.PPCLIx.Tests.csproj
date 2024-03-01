@@ -104,6 +104,7 @@
     <None Include="app.config" />
     <None Include="Nuget\microsoft.powerapps.cli.1.30.7.nupkg" />
     <None Include="Nuget\MikeFactorial.XTB.Plugins.PACUI.1.0.0.nupkg" />
+    <None Include="Nuget\MikeFactorial.XTB.Plugins.PPCLIx.1.2.0.nupkg" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
