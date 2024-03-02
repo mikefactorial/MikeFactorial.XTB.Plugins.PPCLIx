@@ -8,4 +8,4 @@ It's intended for users who may not be familiar or comfortable with working from
 Read more about this project [here](https://mikefactorial.com/?p=1366)
 
 ## Change Log:
-1.0.1 (Initial Version) - With this version you can install and explore all of the versions of PAC CLI and run commands directly from XrmToolBox which will allow you to connect to different organizations and keep your PAC CLI Connection in sync.
+[View on NuGet](https://www.nuget.org/packages/MikeFactorial.XTB.Plugins.PPCLIx#releasenotes-body-tab)
