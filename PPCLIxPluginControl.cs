@@ -1,18 +1,12 @@
 ﻿using McTools.Xrm.Connection;
 using Microsoft.Xrm.Sdk;
-using ScintillaNET;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml.Linq;
-using XrmToolBox.Controls;
 using XrmToolBox.Extensibility;
-using XrmToolBox.Extensibility.Args;
 using XrmToolBox.Extensibility.Interfaces;
 
 namespace MikeFactorial.XTB.PPCLIx

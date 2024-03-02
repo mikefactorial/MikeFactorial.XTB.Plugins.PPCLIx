@@ -22,16 +22,22 @@ namespace MikeFactorial.XTB.PPCLIx
 
         public static string[] RetrieveUsageDetails(string results, string commandText)
         {
-            if (results.Contains("[") && !results.Contains("Error:"))
+            if ((results.Contains("[") || results.Contains("--")) && !results.Contains("Error:"))
             {
                 string usageDetails = results
                     .Split('\n')
-                    .FirstOrDefault(s => s.Contains($"{commandText} ["));
+                    .FirstOrDefault(s => s.Contains($"{commandText} [") || s.Contains($"{commandText} --"));
 
                 if (!string.IsNullOrEmpty(usageDetails))
                 {
+                    string delim = "[";
+                    if (usageDetails.Contains($"{commandText} [--") || usageDetails.Contains($"{commandText} --"))
+                    {
+                        delim = "--";
+                    }
+                    //Handle nouns and verbs
                     return usageDetails
-                        .Substring(usageDetails.IndexOf("["), (usageDetails.LastIndexOf("]") + 1) - usageDetails.IndexOf("[")).Replace("[", "").Replace("]", "")
+                        .Substring(usageDetails.IndexOf(delim), (usageDetails.Length) - usageDetails.IndexOf(delim)).Replace("[", "").Replace("]", "").Replace("\r", "")
                         .Split(' ');
                 }
             }
