@@ -1,3 +1,4 @@
+![image](https://img.shields.io/github/actions/workflow/status/mikefactorial/MikeFactorial.XTB.Plugins.PPCLIx/build.yml?branch=master)  ![image](https://img.shields.io/nuget/vpre/MikeFactorial.XTB.Plugins.PPCLIx)
 # MikeFactorial.XTB.Plugins.PPCLIx
 Power Platform CLIx is an XrmToolBox Plugin that provides a User Interface over top of the Power Platform CLI for ease of connecting, exploring and executing PAC commands.
 
@@ -8,4 +9,4 @@ It's intended for users who may not be familiar or comfortable with working from
 Read more about this project [here](https://mikefactorial.com/?p=1366)
 
 ## Change Log:
-1.0.1 (Initial Version) - With this version you can install and explore all of the versions of PAC CLI and run commands directly from XrmToolBox which will allow you to connect to different organizations and keep your PAC CLI Connection in sync.
+[View on NuGet](https://www.nuget.org/packages/MikeFactorial.XTB.Plugins.PPCLIx#releasenotes-body-tab)
