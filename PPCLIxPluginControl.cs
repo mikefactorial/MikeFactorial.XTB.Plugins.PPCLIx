@@ -8,6 +8,7 @@ using System.Linq;
 using System.Windows.Forms;
 using XrmToolBox.Extensibility;
 using XrmToolBox.Extensibility.Interfaces;
+using static ScintillaNET.Style;
 
 namespace MikeFactorial.XTB.PPCLIx
 {
@@ -21,6 +22,7 @@ namespace MikeFactorial.XTB.PPCLIx
         private PacTag currentSelectedTag = null;
         private static TreeNode mainNode = null;
         private static bool controlInitialized = false;
+        private static bool updatingCommandTextFromProperties = false;
         public PPCLIxPluginControl(PacCLINugetFeed feed) : this()
         {
             nugetFeed = feed;
@@ -696,7 +698,15 @@ namespace MikeFactorial.XTB.PPCLIx
         /// <param name="e">Event Arguments</param>
         private void propertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
         {
-            UpdateCommandText();
+            updatingCommandTextFromProperties = true;
+            try
+            {
+                UpdateCommandText();
+            }
+            finally
+            {
+                updatingCommandTextFromProperties = false;
+            }
         }
         /// <summary>
         /// Updates the help text section of the property grid
@@ -784,6 +794,114 @@ namespace MikeFactorial.XTB.PPCLIx
         public void textBoxCommandText_TextChanged(object sender, EventArgs e)
         {
             toolStripRunButton.Enabled = textBoxCommandText.Text.StartsWith("pac ");
+            fillArgumentsFromCommandText(textBoxCommandText.Text);
+        }
+
+        private void fillArgumentsFromCommandText(string commandText)
+        {
+            var args = parseCommandArguments(commandText);
+            if (args != null)
+            {
+                UpdatePropertyGridPropertiesFromArguments(args);
+            }
+        }
+        public Dictionary<string, string> parseCommandArguments(string commandText)
+        {
+            if (commandText.StartsWith("pac "))
+            {
+                var commandParts = new List<string>();
+                var currentPart = new System.Text.StringBuilder();
+                bool insideQuotes = false;
+
+                // Split command text while respecting quoted strings
+                foreach (var c in commandText)
+                {
+                    if (c == '"' && !insideQuotes)
+                    {
+                        insideQuotes = true;
+                        currentPart.Append(c);
+                    }
+                    else if (c == '"' && insideQuotes)
+                    {
+                        insideQuotes = false;
+                        currentPart.Append(c);
+                    }
+                    else if (c == ' ' && !insideQuotes)
+                    {
+                        if (currentPart.Length > 0)
+                        {
+                            commandParts.Add(currentPart.ToString());
+                            currentPart.Clear();
+                        }
+                    }
+                    else
+                    {
+                        currentPart.Append(c);
+                    }
+                }
+
+                if (currentPart.Length > 0)
+                {
+                    commandParts.Add(currentPart.ToString());
+                }
+
+                if (commandParts.Count > 1)
+                {
+                    var noun = commandParts[1];
+                    var verb = commandParts.Count > 2 ? commandParts[2] : string.Empty;
+
+                    var arguments = new Dictionary<string, string>();
+                    string currentKey = null;
+
+                    for (var i = 3; i < commandParts.Count; i++)
+                    {
+                        var part = commandParts[i];
+                        if (part.StartsWith("--") || part.StartsWith("-"))
+                        {
+                            if (currentKey != null)
+                            {
+                                arguments[currentKey] = string.Empty; // Handle flags without values
+                            }
+                            currentKey = part;
+                        }
+                        else if (currentKey != null)
+                        {
+                            arguments[currentKey] = part.Trim('"');
+                            currentKey = null;
+                        }
+                    }
+
+                    if (currentKey != null)
+                    {
+                        arguments[currentKey] = string.Empty; // Handle trailing flag
+                    }
+                    return arguments;
+                }
+            }
+            return null;
+        }
+
+        private void UpdatePropertyGridPropertiesFromArguments(Dictionary<string, string> arguments)
+        {
+            if (!updatingCommandTextFromProperties)
+            {
+                var iEnum = arguments.GetEnumerator();
+                var properties = this.propertyGrid1.SelectedObject as PacTagListPropertyGridAdapter;
+                if (properties != null)
+                {
+                    while (iEnum.MoveNext())
+                    {
+                        var tag = properties.TagList.FirstOrDefault(t => t.Name == iEnum.Current.Key);
+                        if (tag != null)
+                        {
+                            tag.Value = iEnum.Current.Value;
+                        }
+                    }
+
+                    this.propertyGrid1.SelectedObject = new PacTagListPropertyGridAdapter(properties.TagList);
+
+                }
+            }
         }
         #endregion
     }

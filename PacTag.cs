@@ -91,6 +91,14 @@ namespace MikeFactorial.XTB.PPCLIx
 
             return new PropertyDescriptorCollection(props);
         }
+
+        public List<PacTag> TagList
+        {
+            get
+            {
+                return this._tagList;
+            }
+        }
     }
 
     class PacTagListPropertyDescriptor : PropertyDescriptor

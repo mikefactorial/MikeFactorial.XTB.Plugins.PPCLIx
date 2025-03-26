@@ -258,5 +258,25 @@ namespace MikeFactorial.XTB.Plugins.PPCLIx.Tests
             control.TreePacCommands.AfterSelect += control.TreePacCommands_AfterSelect;
             control.ToolStripCLIVersionsDropDown.SelectedIndexChanged += control.ToolStripCLIVersionsDropDown_SelectedIndexChanged;
         }
+        [TestMethod]
+        public void TestParseCommandArguments()
+        {
+            PPCLIxPluginControl control = new PPCLIxPluginControl();
+            var command = "pac auth select --index 1 --name \"Test Argument\"";
+            var result = control.parseCommandArguments(command);
+            Assert.IsTrue(result != null);
+            Assert.IsTrue(result.Count == 2);
+            Assert.AreEqual(result["--index"], "1");
+            Assert.AreEqual(result["--name"], "Test Argument");
+
+            command = "pac auth select -i 1 --name \"Test Argument\"";
+            result = control.parseCommandArguments(command);
+            Assert.IsTrue(result != null);
+            Assert.IsTrue(result.Count == 2);
+            Assert.AreEqual(result["-i"], "1");
+            Assert.AreEqual(result["--name"], "Test Argument");
+
+
+        }
     }
 }
